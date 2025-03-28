@@ -1,0 +1,12 @@
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/CMakeFiles/smarteye.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/CMakeFiles/edit_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/CMakeFiles/rebuild_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/CMakeFiles/SmartEye_ThirdParty.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/HPSocket/CMakeFiles/edit_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/HPSocket/CMakeFiles/rebuild_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/HPSocket/CMakeFiles/HpSocket_static.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/Communication/CMakeFiles/edit_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/Communication/CMakeFiles/rebuild_cache.dir
+/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/Communication/CMakeFiles/Communication_static.dir

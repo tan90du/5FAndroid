@@ -1,0 +1,69 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android",
+      "sdkFolder": "/Users/lpf/Library/Android/sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/build/intermediates",
+      "gradleModulePathName": ":SmartEye",
+      "moduleRootFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye",
+      "makeFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/cpp/CMakeLists.txt",
+      "buildSystem": "CMAKE",
+      "compilerSettingsCacheFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/.cxx",
+      "cxxFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx",
+      "ndkFolder": "/Users/lpf/Library/Android/sdk/ndk/21.4.7075529",
+      "ndkVersion": "21.4.7075529",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [
+      "-std\u003dc++14"
+    ],
+    "variantName": "debug",
+    "soFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/build/intermediates/cmake/debug/lib",
+    "objFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/build/intermediates/cmake/debug/obj",
+    "jsonFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug",
+    "gradleBuildOutputFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug",
+    "isDebuggableEnabled": true,
+    "validAbiList": [
+      "ARM64_V8A"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "ARM64_V8A",
+  "abiPlatformVersion": 16,
+  "cxxBuildFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a",
+  "jsonFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/android_gradle_build.json",
+  "gradleBuildOutputFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a",
+  "objFolder": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/build/intermediates/cmake/debug/obj/arm64-v8a",
+  "buildCommandFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/build_command.txt",
+  "buildOutputFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/build_output.txt",
+  "modelOutputFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/build_model.json",
+  "cmake": {
+    "cmakeListsWrapperFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a/CMakeLists.txt",
+    "toolchainWrapperFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a/android_gradle_build.toolchain.cmake",
+    "buildGenerationStateFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a/build_generation_state.json",
+    "cacheKeyFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a/compiler_cache_key.json",
+    "compilerCacheUseFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a/compiler_cache_use.json",
+    "compilerCacheWriteFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a/compiler_cache_write.json",
+    "toolchainSettingsFromCacheFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cxx/debug/arm64-v8a/compiler_settings_cache.cmake",
+    "cmakeWrappingBaseFolder": "."
+  },
+  "jsonGenerationLoggingRecordFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/json_generation_record.json",
+  "compileCommandsJsonFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/compile_commands.json"
+}

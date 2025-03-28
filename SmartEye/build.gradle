@@ -1,0 +1,69 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.2"
+    defaultConfig {
+        applicationId "com.autonavi.smarteye"
+        minSdkVersion 14
+        targetSdkVersion 29
+        versionCode 120
+        versionName "120"
+        flavorDimensions "default"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++14"
+            }
+
+            ndk {
+                abiFilter('arm64-v8a')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            ndk {
+                abiFilter('arm64-v8a')
+            }
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            jniDebuggable true
+            ndk {
+                abiFilter('arm64-v8a')
+            }
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    productFlavors {
+
+
+    } // SocolJenkins
+
+
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+
+        }
+    }
+}
+
+dependencies {
+    //    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/commons-codec-1.6.jar')
+    implementation 'com.ucweb.wpk:crashsdk:latest.release'
+    testCompile 'junit:junit:4.12'
+    implementation 'com.linkedin.dexmaker:dexmaker:2.25.0'
+    compile 'com.android.support:appcompat-v7:23.1.0'
+    compile 'com.squareup.okhttp:okhttp:2.4.0'
+    compile 'com.squareup.okio:okio:1.5.0'
+}

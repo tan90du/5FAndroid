@@ -1,0 +1,61 @@
+{
+  "ndkFolder": "/Users/lpf/Library/Android/sdk/ndk/21.4.7075529",
+  "messages": [
+    {
+      "level": "INFO",
+      "message": "android.ndkVersion from module build.gradle is not set"
+    },
+    {
+      "level": "INFO",
+      "message": "ndk.dir in local.properties is /Users/lpf/Library/Android/sdk/ndk/21.4.7075529"
+    },
+    {
+      "level": "INFO",
+      "message": "ANDROID_NDK_HOME environment variable is not set"
+    },
+    {
+      "level": "INFO",
+      "message": "sdkFolder is /Users/lpf/Library/Android/sdk"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/21.4.7075529 by ndk.dir"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk-bundle in SDK ndk-bundle folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/21.4.7075529 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/25.2.9519653 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/25.1.8937393 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/27.0.12077973 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/19.2.5345600 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/26.1.10909125 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/23.1.7779620 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Found requested ndk.dir (/Users/lpf/Library/Android/sdk/ndk/21.4.7075529) which has version 21.4.7075529"
+    }
+  ]
+}
