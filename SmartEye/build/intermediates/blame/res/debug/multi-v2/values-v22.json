@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/build/intermediates/incremental/mergeDebugResources/merged.dir/values-v22/values-v22.xml",
+            "outputFile": "E:\\Projects\\BeAndroid\\5FAndroid\\SmartEye\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v22\\values-v22.xml",
             "map": [
                 {
-                    "source": "/Users/lpf/.gradle/caches/transforms-2/files-2.1/fc23c048c456a94c3caa756b3f905a0f/appcompat-v7-23.1.0/res/values-v22/values-v22.xml",
+                    "source": "C:\\Users\\18079\\.gradle\\caches\\transforms-2\\files-2.1\\fc23c048c456a94c3caa756b3f905a0f\\appcompat-v7-23.1.0\\res\\values-v22\\values-v22.xml",
                     "from": {
                         "startLines": "4,5,6,9",
                         "startColumns": "4,4,4,4",

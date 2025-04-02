@@ -5,6 +5,7 @@
       "sdkFolder": "D:\\Software\\Android Studio\\envs",
       "isNativeCompilerSettingsCacheEnabled": false,
       "isBuildOnlyTargetAbiEnabled": true,
+      "ideBuildTargetAbi": "arm64-v8a,armeabi-v7a,armeabi",
       "splitsAbiFilterSet": [],
       "intermediatesFolder": "E:\\Projects\\BeAndroid\\5FAndroid\\SmartEye\\build\\intermediates",
       "gradleModulePathName": ":SmartEye",

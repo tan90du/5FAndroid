@@ -5,70 +5,72 @@
 5    android:versionName="120" >
 6
 7    <uses-sdk
-8        android:minSdkVersion="14"
-8-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml
+8        android:minSdkVersion="19"
+8-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml
 9        android:targetSdkVersion="29" />
-9-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml
+9-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml
 10
 11    <uses-permission android:name="com.spt.carengine.config.permission.R_READ" />
-11-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:7:5-82
-11-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:7:22-79
+11-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:8:5-82
+11-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:8:22-79
 12    <uses-permission android:name="com.spt.carengine.config.permission.R_WRITE" />
-12-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:8:5-83
-12-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:8:22-80
+12-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:9:5-83
+12-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:9:22-80
 13    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-13-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:9:5-76
-13-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:9:22-73
+13-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:10:5-76
+13-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:10:22-73
 14    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-14-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:10:5-75
-14-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:10:22-72
+14-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:11:5-75
+14-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:11:22-72
 15    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-15-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:11:5-79
-15-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:11:22-76
+15-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:12:5-79
+15-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:12:22-76
 16    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-16-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:12:5-79
-16-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:12:22-76
+16-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:13:5-79
+16-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:13:22-76
 17    <uses-permission android:name="android.permission.INTERNET" />
-17-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:13:5-67
-17-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:13:22-64
+17-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:14:5-67
+17-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:14:22-64
 18    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-18-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:14:5-81
-18-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:14:22-78
+18-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:15:5-81
+18-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:15:22-78
 19    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-19-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:15:5-80
-19-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:15:22-77
+19-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:16:5-80
+19-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:16:22-77
 20
 21    <application
-21-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:17:5-33:19
+21-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:18:5-35:19
 22        android:name="com.autonavi.smarteye.App"
-22-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:18:9-28
+22-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:19:9-28
 23        android:allowBackup="false"
-23-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:19:9-36
+23-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:20:9-36
 24        android:debuggable="true"
 25        android:icon="@mipmap/ic_launcher"
-25-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:20:9-43
+25-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:21:9-43
 26        android:label="@string/app_name"
-26-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:22:9-41
+26-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:22:9-41
 27        android:testOnly="true"
-28        android:theme="@style/AppTheme" >
-28-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:21:9-40
-29        <activity
-29-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:23:9-31:20
-30            android:name="com.autonavi.smarteye.MainActivity"
-30-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:24:13-41
-31            android:label="@string/app_name" >
-31-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:25:13-45
-32            <intent-filter>
-32-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:26:13-30:29
-33                <action android:name="android.intent.action.MAIN" />
-33-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:27:17-69
-33-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:27:25-66
-34
-35                <category android:name="android.intent.category.LAUNCHER" />
-35-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:29:17-77
-35-->/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/AndroidManifest.xml:29:27-74
-36            </intent-filter>
-37        </activity>
-38    </application>
-39
-40</manifest>
+28        android:theme="@style/AppTheme"
+28-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:23:9-40
+29        android:usesCleartextTraffic="true" >
+29-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:24:9-44
+30        <activity
+30-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:25:9-33:20
+31            android:name="com.autonavi.smarteye.MainActivity"
+31-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:26:13-41
+32            android:label="@string/app_name" >
+32-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:27:13-45
+33            <intent-filter>
+33-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:28:13-32:29
+34                <action android:name="android.intent.action.MAIN" />
+34-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:29:17-69
+34-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:29:25-66
+35
+36                <category android:name="android.intent.category.LAUNCHER" />
+36-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:31:17-77
+36-->E:\Projects\BeAndroid\5FAndroid\SmartEye\src\main\AndroidManifest.xml:31:27-74
+37            </intent-filter>
+38        </activity>
+39    </application>
+40
+41</manifest>

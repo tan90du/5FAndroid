@@ -1,4 +1,4 @@
-#Fri Mar 28 10:17:54 CST 2025
-base.0=/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/build/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+#Wed Apr 02 12:49:54 CST 2025
+base.0=E\:\\Projects\\BeAndroid\\5FAndroid\\SmartEye\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
 renamed.0=classes.dex
 path.0=classes.dex

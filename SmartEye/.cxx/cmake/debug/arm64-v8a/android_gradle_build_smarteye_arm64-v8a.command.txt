@@ -1,7 +1,7 @@
-Executable : /Users/lpf/Library/Android/sdk/cmake/3.6.4111459/bin/cmake
+Executable : D:\Software\Android Studio\envs\cmake\3.6.4111459\bin\cmake.exe
 arguments : 
 --build
-/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a
+E:\Projects\BeAndroid\5FAndroid\SmartEye\.cxx\cmake\debug\arm64-v8a
 --target
 smarteye
 jvmArgs : 
