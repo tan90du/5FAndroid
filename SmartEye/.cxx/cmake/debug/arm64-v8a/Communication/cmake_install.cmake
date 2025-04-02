@@ -1,8 +1,8 @@
-# Install script for directory: /Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/cpp/Communication
+# Install script for directory: E:/Projects/BeAndroid/5FAndroid/SmartEye/src/main/cpp/Communication
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/smarteye")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 

@@ -1,5 +1,5 @@
 {
-  "ndkFolder": "/Users/lpf/Library/Android/sdk/ndk/21.4.7075529",
+  "ndkFolder": "D:\\Software\\Android Studio\\envs\\ndk\\21.4.7075529",
   "messages": [
     {
       "level": "INFO",
@@ -7,7 +7,7 @@
     },
     {
       "level": "INFO",
-      "message": "ndk.dir in local.properties is /Users/lpf/Library/Android/sdk/ndk/21.4.7075529"
+      "message": "ndk.dir in local.properties is D:\\Software\\Android Studio\\envs\\ndk\\21.4.7075529"
     },
     {
       "level": "INFO",
@@ -15,47 +15,27 @@
     },
     {
       "level": "INFO",
-      "message": "sdkFolder is /Users/lpf/Library/Android/sdk"
+      "message": "sdkFolder is D:\\Software\\Android Studio\\envs"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/21.4.7075529 by ndk.dir"
+      "message": "Considering D:\\Software\\Android Studio\\envs\\ndk\\21.4.7075529 by ndk.dir"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk-bundle in SDK ndk-bundle folder"
+      "message": "Considering D:\\Software\\Android Studio\\envs\\ndk-bundle in SDK ndk-bundle folder"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/21.4.7075529 in SDK ndk folder"
+      "message": "Considering D:\\Software\\Android Studio\\envs\\ndk\\21.4.7075529 in SDK ndk folder"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/25.2.9519653 in SDK ndk folder"
+      "message": "Rejected D:\\Software\\Android Studio\\envs\\ndk-bundle in SDK ndk-bundle folder because that location has no source.properties"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/25.1.8937393 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/27.0.12077973 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/19.2.5345600 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/26.1.10909125 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Considering /Users/lpf/Library/Android/sdk/ndk/23.1.7779620 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Found requested ndk.dir (/Users/lpf/Library/Android/sdk/ndk/21.4.7075529) which has version 21.4.7075529"
+      "message": "Found requested ndk.dir (D:\\Software\\Android Studio\\envs\\ndk\\21.4.7075529) which has version 21.4.7075529"
     }
   ]
 }

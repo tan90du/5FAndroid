@@ -1,8 +1,8 @@
-# Install script for directory: /Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/src/main/cpp
+# Install script for directory: E:/Projects/BeAndroid/5FAndroid/SmartEye/src/main/cpp
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/usr/local")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/smarteye")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -34,8 +34,8 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/cmake_install.cmake")
-  include("/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/Communication/cmake_install.cmake")
+  include("E:/Projects/BeAndroid/5FAndroid/SmartEye/.cxx/cmake/debug/arm64-v8a/ThirdPartyLib/cmake_install.cmake")
+  include("E:/Projects/BeAndroid/5FAndroid/SmartEye/.cxx/cmake/debug/arm64-v8a/Communication/cmake_install.cmake")
 
 endif()
 
@@ -47,5 +47,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/.cxx/cmake/debug/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "E:/Projects/BeAndroid/5FAndroid/SmartEye/.cxx/cmake/debug/arm64-v8a/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

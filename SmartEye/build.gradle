@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.autonavi.smarteye"
-        minSdkVersion 14
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode 120
         versionName "120"
@@ -29,6 +29,7 @@ android {
             ndk {
                 abiFilter('arm64-v8a')
             }
+            signingConfig signingConfigs.debug
         }
         debug {
             minifyEnabled false

@@ -139,6 +139,11 @@ public:
     void setCompressedData(BYTE *compressedData) {
         this->compressedData = compressedData;
     }
+
+    size_t getDataSize() const {
+        return getWidth() * getHeight() * 3 / 2;  // YUV420 格式计算
+    }
+
 // 私有的
 public:
     std::string filePath = "";

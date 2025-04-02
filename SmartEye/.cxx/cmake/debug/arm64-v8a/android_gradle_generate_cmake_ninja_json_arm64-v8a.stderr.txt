@@ -9,4 +9,4 @@ status添加HPSocket
 ### 开始编译HPSocket ###
 _INCLUDE_HPSocket_: NO
 status正在编译 Communication
-statuslibpath:/Users/lpf/Desktop/SmartEye接口/0328版本/Android/SmartEye/build/intermediates/cmake/debug/obj/arm64-v8a
+statuslibpath:E:\Projects\BeAndroid\5FAndroid\SmartEye\build\intermediates\cmake\debug\obj\arm64-v8a
