@@ -1,0 +1,5 @@
+// 可用于生成系统签名后的apk
+
+若需要OTA
+将签名后的apk重命名为SmartEye-release-sign.apk 提交到apk目录 bigeye系统可集成最新的apk image文件
+// git@gitlab.alibaba-inc.com:hw_bsp/bigeye_binary.git
