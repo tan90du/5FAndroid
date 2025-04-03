@@ -1,25 +1,13 @@
 package com.autonavi.smarteye;
 
 
-import android.Manifest;
+import static com.autonavi.smarteye.service.http.HttpClient.fetchDataAsync;
+
 import android.app.Application;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import android.provider.Settings;
-
 import com.autonavi.smarteye.config.Config;
-import com.autonavi.smarteye.service.DataSender;
-import com.autonavi.smarteye.util.SDCardTool;
-
-import java.lang.reflect.Method;
-import java.net.NetworkInterface;
-import java.util.Collections;
-import java.util.List;
+import com.autonavi.smarteye.service.http.HttpCallback;
 
 public class App extends Application {
 
@@ -29,17 +17,29 @@ public class App extends Application {
         super.onCreate();
 
         Config.init(this);
+
         System.loadLibrary("smarteye");
         SmartEye.start();
 
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.d("DataSender", "子线程调用 uploadImg()");
-//                DataSender ds = new DataSender();
-//                ds.uploadImg();
-//                Log.d("DataSender", "uploadImg() 执行完成");
-//            }
-//        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                // 异步请求示例 POST请求示例
+                fetchDataAsync("http://113.44.214.28:28080/admin-api/pcmanager/arithmetic/location/reporting",
+                        "POST", "{\"mac\": \"123\", \"location\": \"113.4214,32.142\"}", new HttpCallback() {
+                            @Override
+                            public void onSuccess(String response) {
+                                // 处理逻辑
+                                Log.i("Response", response);
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Log.i("Request failed: ", e.getMessage());
+                            }
+                        });
+            }
+        }).start();
     }
 }
