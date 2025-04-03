@@ -21,20 +21,34 @@ android {
         }
     }
 
+    signingConfigs {
+
+        systemSign {
+            keyAlias 'smarteye'
+            keyPassword 'smarteye123456'
+            storeFile file('system.keystore')
+            storePassword 'smarteye123456'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
+            // 可自由切换签名
+            signingConfig signingConfigs.systemSign
+
             ndk {
                 abiFilter('arm64-v8a')
             }
-            signingConfig signingConfigs.debug
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             jniDebuggable true
+            // 可自由切换签名
+            signingConfig signingConfigs.systemSign
             ndk {
                 abiFilter('arm64-v8a')
             }
@@ -56,6 +70,36 @@ android {
 
         }
     }
+}
+
+// 直接运行可生成带系统签名的apk
+task signRelease (){
+    dependsOn 'assembleRelease'
+    doLast {
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                if (outputFile.name.contains("release")) {
+
+                    String newName = getApkName()
+                    // 直接运行安装apk  build/outputs/apk
+                    def apkFilePath = getBuildDir().absolutePath + "/outputs/apk/release/"+newName+"-release.apk"
+                    def apkDir = getBuildDir().absolutePath + "/outputs/apk/release"
+                    println 'apkFilePath = ' + apkFilePath
+                    def signDir = getProjectDir().absolutePath
+                    println signDir
+
+                    exec {
+                        // 切换到sh文件所在的目录，执行脚本
+                        workingDir signDir
+                        // 执行shell脚本 "," 传参
+                        commandLine "sh", signDir + "/sign/sign.sh", signDir, apkFilePath, apkDir + "/"+ newName+"-release-signed.apk"
+                    }
+
+                }
+            }
+        }
+    }
+
 }
 
 dependencies {

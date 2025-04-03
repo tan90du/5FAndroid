@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.autonavi.smarteye"
     android:versionCode="1"
-    android:versionName="1">
+    android:versionName="1"
+    android:sharedUserId="android.uid.system">
 
     <uses-permission android:name="com.spt.carengine.config.permission.R_READ" />
     <uses-permission android:name="com.spt.carengine.config.permission.R_WRITE" />

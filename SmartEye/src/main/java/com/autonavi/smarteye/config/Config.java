@@ -11,8 +11,7 @@ import java.lang.reflect.Method;
 
 public class Config {
     // 设备物理ID
-    public static String deviceId = "cvcv";
-//    public static String deviceId = getSystemPropertiesByKey("ro.serialno");
+    public static String deviceId = getSystemPropertiesByKey("ro.serialno");
     // 服务器IP地址
     public static String serverIpAddress = "http://113.44.214.28:28080/admin-api/pcmanager/arithmetic";
     // 设备IMEI

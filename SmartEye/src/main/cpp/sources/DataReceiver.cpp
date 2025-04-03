@@ -50,9 +50,18 @@ void serverDieCallback(void) {
 void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData, uint32_t frameIndex) {
     SmartFrame *smartFrame = ygiData->getSmartFrame();
     if (smartFrame && smartFrame->getFrameData() != nullptr && smartFrame->getDataSize() > 0) {
+        //创建文件夹
+        std::string dirPath = CxxCallJavaHelper::call("getAppSDCardPath", "") + "img/";
+        DIR *dir = opendir(dirPath.c_str());
+        if (dir) {
+            closedir(dir);
+        } else {
+            std::string cmd = "mkdir -p ";
+            cmd += dirPath;
+            system(cmd.c_str());
+        }
         // 生成文件名，例如 frame_100.yuv
-        std::string filename = CxxCallJavaHelper::call("getAppSDCardPath", "") + "img/" +  std::to_string(frameIndex) + ".yuv";
-
+        std::string filename = dirPath +  std::to_string(frameIndex) + ".yuv";
         // 打开文件进行二进制写入
         std::ofstream outFile(filename, std::ios::out | std::ios::binary);
         if (outFile.is_open()) {
@@ -89,6 +98,8 @@ void frameDataCallback(uint32_t frameIndex) {
                   ygiData->getGpsVector()->at(0)->getLat(),
                   ygiData->getGpsVector()->at(0)->getGpsStatus());
         Log::info("DataReceiver", "ygiData 获取到一帧");
+
+//        std::string str = CxxCallJavaHelper::call("UpLoadImg", "");
 
         Log::info("DataReceiver", "服务端保存视频帧到sdcard");
         saveFrameDataToFile(ygiData, frameIndex);

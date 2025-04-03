@@ -15,10 +15,7 @@ public class SmartEye {
         String response = null;
         switch (actionType) {
             case "getAppSDCardPath":
-                response = SDCardTool.getAppOuterDirectory();
-                break;
-            case "UpLoadImg":
-                response = DataSender.uploadImg(json);
+                response = "/storage/ext4_sdcard/Android/data/";//SDCardTool.getAppOuterDirectory();
                 break;
             case "GetEth0Address":
                 response = NetUtils.getEth0Address("usb0");
