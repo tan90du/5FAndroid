@@ -15,7 +15,8 @@ public class DataSender {
     private static final String ipAddress = Config.serverIpAddress;
     private static final String deviceId = Config.deviceId;
 
-    public void uploadImg() {
+    public static String uploadImg(String json) {
+        Log.i("拿到数据了", json);
         try {
             // 指定目标 URL
             String ipAddress = Config.serverIpAddress;
@@ -59,6 +60,7 @@ public class DataSender {
         } catch (Exception e) {
             Log.e("DataSender", "上传异常 " + e);
         }
+        return "成功了";
     }
 
 

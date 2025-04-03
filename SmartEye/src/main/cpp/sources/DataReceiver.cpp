@@ -51,9 +51,7 @@ void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData, uint32_t frameIndex) 
     SmartFrame *smartFrame = ygiData->getSmartFrame();
     if (smartFrame && smartFrame->getFrameData() != nullptr && smartFrame->getDataSize() > 0) {
         // 生成文件名，例如 frame_100.yuv
-        std::string filename =
-                "/data/data/com.autonavi.smarteye/" + std::to_string(frameIndex) + ".yuv";
-//        std::string filename = "/sdcard/DCIM/Camera/" + std::to_string(frameIndex) + ".yuv";
+        std::string filename = CxxCallJavaHelper::call("getAppSDCardPath", "") + "img/" +  std::to_string(frameIndex) + ".yuv";
 
         // 打开文件进行二进制写入
         std::ofstream outFile(filename, std::ios::out | std::ios::binary);

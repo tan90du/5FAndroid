@@ -1,0 +1,7 @@
+# 忽略构建输出目录（适用于 Gradle 项目）
+/SmartEye/build
+/SmartEye/.cxx/
+
+# 忽略本地配置文件
+/local.properties
+

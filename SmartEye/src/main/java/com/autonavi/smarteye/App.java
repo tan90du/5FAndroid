@@ -1,5 +1,6 @@
 package com.autonavi.smarteye;
 
+
 import android.Manifest;
 import android.app.Application;
 import android.content.Context;
@@ -13,15 +14,12 @@ import android.provider.Settings;
 
 import com.autonavi.smarteye.config.Config;
 import com.autonavi.smarteye.service.DataSender;
+import com.autonavi.smarteye.util.SDCardTool;
 
 import java.lang.reflect.Method;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import java.util.List;
-
-//public static String getAndroidId(Context context) {
-//    return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-//}
 
 public class App extends Application {
 
@@ -29,8 +27,9 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        System.loadLibrary("smarteye");
 
+        Config.init(this);
+        System.loadLibrary("smarteye");
         SmartEye.start();
 
 //        new Thread(new Runnable() {
@@ -42,19 +41,5 @@ public class App extends Application {
 //                Log.d("DataSender", "uploadImg() 执行完成");
 //            }
 //        }).start();
-
-//        // 检查权限
-//        Context context = getApplicationContext();
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-//            Log.i("Config", "Permission not granted");
-//        }
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            Log.i("Config",Build.getSerial());  // 从 Android 8.0 开始使用 getSerial() 获取设备序列号
-//        } else {
-//            Log.i("Config",Build.SERIAL);
-//        }
-
-
     }
 }
