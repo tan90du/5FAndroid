@@ -5,7 +5,19 @@
 #include "Communication.h"
 #include "CxxCallJavaHelper.h"
 #include "thread.h"
-
+#include <sys/stat.h> // Linux/MacOS平台需要这两个头文件
+#include <sys/types.h>
+// 辅助函数：创建目录
+bool createDirectory(const std::string& path) {
+    size_t pos = 0;
+    do {
+        pos = path.find_first_of('/', pos + 1);
+        if (mkdir(path.substr(0, pos).c_str(), 0777) != 0 && errno != EEXIST) {
+            return false;
+        }
+    } while (pos != std::string::npos);
+    return true;
+}
 
 Communication *Communication::getSingleton() {
     static Communication *communication;
@@ -49,6 +61,104 @@ void Communication::init(OnAcceptCallBack callback){
 
         }
         Log::info("Communication", "收到TCP数据，大小:%d", length);
+        // 新增文件接收逻辑
+        const uint8_t* byteData = reinterpret_cast<const uint8_t*>(data);
+        int offset = 0;
+
+        // 1. 解析数据类型
+        int dataType;
+        if (offset + 4 > length) return;
+        memcpy(&dataType, byteData + offset, 4);
+        offset += 4;
+        Log::info("Communication", "lihongwei-111111111111111111:%d", dataType);
+
+        // 验证是否为文件传输类型（假设DataType::Send_Disease对应特定值）
+        if (dataType != 70) return; // 替换为实际的Send_Disease值
+        Log::info("Communication", "lihongwei-22222222222222");
+
+        // 2. 解析JSON长度
+        int jsonLen;
+        if (offset + 4 > length) return;
+        memcpy(&jsonLen, byteData + offset, 4);
+        offset += 4;
+        Log::info("Communication", "lihongwei-333333333333");
+
+        // 3. 提取并手动解析JSON
+        if (offset + jsonLen + 4 > length) return;
+        std::string jsonStr(reinterpret_cast<const char*>(byteData + offset), jsonLen);
+        offset += jsonLen;
+
+        // 手动解析文件夹名
+        std::string folderName;
+        size_t folderStart = jsonStr.find("\"folder\":\"");
+        if (folderStart != std::string::npos) {
+            folderStart += 10; // 跳过"folder":"
+            size_t folderEnd = jsonStr.find('\"', folderStart);
+            if (folderEnd != std::string::npos) {
+                folderName = jsonStr.substr(folderStart, folderEnd - folderStart);
+            }
+        }
+        Log::info("Communication", "lihongwei-4444444444444444");
+
+        // 手动解析文件名列表
+        std::vector<std::string> fileNames;
+        size_t filesStart = jsonStr.find("\"files\":[");
+        if (filesStart != std::string::npos) {
+            filesStart += 9; // 跳过"files":[
+            size_t filesEnd = jsonStr.find(']', filesStart);
+            if (filesEnd != std::string::npos) {
+                std::string filesSection = jsonStr.substr(filesStart, filesEnd - filesStart);
+                size_t pos = 0;
+                while ((pos = filesSection.find('\"', pos)) != std::string::npos) {
+                    size_t endPos = filesSection.find('\"', pos + 1);
+                    if (endPos == std::string::npos) break;
+                    fileNames.push_back(filesSection.substr(pos + 1, endPos - pos - 1));
+                    pos = endPos + 1;
+                }
+            }
+        }
+        Log::info("Communication", "lihongwei-5555555555555555555");
+
+        // 4. 解析文件数量
+        int fileCount;
+        memcpy(&fileCount, byteData + offset, 4);
+        offset += 4;
+
+        // 创建本地存储目录
+        const std::string baseSavePath = "/storage/ext4_sdcard/Android/data/img/marked/";
+        std::string fullPath = baseSavePath + folderName;
+        if (!createDirectory(fullPath)) {
+            Log::info("FileSave", "Failed to create directory: %s", fullPath.c_str());
+            return;
+        }
+        Log::info("Communication", "lihongwei-66666666666666666");
+
+        // 5. 遍历保存每个文件
+        for (int i = 0; i < fileCount; ++i) {
+            if (offset + 4 > length) break;
+
+            // 解析文件大小
+            int fileSize;
+            memcpy(&fileSize, byteData + offset, 4);
+            offset += 4;
+
+            // 检查数据边界
+            if (offset + fileSize > length) break;
+
+            // 写入文件
+            std::string filename = fullPath + "/" + fileNames[i];
+            FILE* fp = fopen(filename.c_str(), "wb");
+            if (fp) {
+                fwrite(byteData + offset, 1, fileSize, fp);
+                fclose(fp);
+                Log::info("FileSave", "Saved: %s (%d bytes)", filename.c_str(), fileSize);
+            } else {
+                Log::info("FileSave", "Failed to write: %s", filename.c_str());
+            }
+            offset += fileSize;
+        }
+
+        Log::info("FileSave", "接收到 %d 个文件，在文件夹: %s中", fileCount, folderName.c_str());
     });
 
     // 建议每30秒检测下 上次获取版本号的时间 若超时则 重新创建server
