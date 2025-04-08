@@ -70,18 +70,15 @@ void Communication::init(OnAcceptCallBack callback){
         if (offset + 4 > length) return;
         memcpy(&dataType, byteData + offset, 4);
         offset += 4;
-        Log::info("Communication", "lihongwei-111111111111111111:%d", dataType);
 
         // 验证是否为文件传输类型（假设DataType::Send_Disease对应特定值）
         if (dataType != 70) return; // 替换为实际的Send_Disease值
-        Log::info("Communication", "lihongwei-22222222222222");
 
         // 2. 解析JSON长度
         int jsonLen;
         if (offset + 4 > length) return;
         memcpy(&jsonLen, byteData + offset, 4);
         offset += 4;
-        Log::info("Communication", "lihongwei-333333333333");
 
         // 3. 提取并手动解析JSON
         if (offset + jsonLen + 4 > length) return;
@@ -98,7 +95,6 @@ void Communication::init(OnAcceptCallBack callback){
                 folderName = jsonStr.substr(folderStart, folderEnd - folderStart);
             }
         }
-        Log::info("Communication", "lihongwei-4444444444444444");
 
         // 手动解析文件名列表
         std::vector<std::string> fileNames;
@@ -117,7 +113,6 @@ void Communication::init(OnAcceptCallBack callback){
                 }
             }
         }
-        Log::info("Communication", "lihongwei-5555555555555555555");
 
         // 4. 解析文件数量
         int fileCount;
@@ -131,7 +126,6 @@ void Communication::init(OnAcceptCallBack callback){
             Log::info("FileSave", "Failed to create directory: %s", fullPath.c_str());
             return;
         }
-        Log::info("Communication", "lihongwei-66666666666666666");
 
         // 5. 遍历保存每个文件
         for (int i = 0; i < fileCount; ++i) {
