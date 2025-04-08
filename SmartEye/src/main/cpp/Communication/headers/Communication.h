@@ -45,6 +45,7 @@ public:
     void init(OnAcceptCallBack callback)  ;
 
     bool connected()  ;
+    void send(const unsigned char* data, int length);
 
     /**
      * 注册各种来自客户端的请求 接收到一个病害
@@ -77,7 +78,6 @@ public:
 
 private:
 private:
-    void send(const unsigned char* data, int length);
 
     void resetServer();
 
