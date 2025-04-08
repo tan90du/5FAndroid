@@ -8,6 +8,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -51,7 +53,7 @@ public class HttpClient {
             throw new IOException("Unexpected response " + response);
         }
 
-        return response.body().string();
+        return response.toString();
     }
 
     // 异步请求 Asynchronization
@@ -89,7 +91,11 @@ public class HttpClient {
                     return;
                 }
                 // 成功回调
-                callback.onSuccess(response.body().string());
+                try {
+                    callback.onSuccess(response.body().string());
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }

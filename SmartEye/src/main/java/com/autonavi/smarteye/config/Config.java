@@ -11,9 +11,13 @@ import java.lang.reflect.Method;
 
 public class Config {
     // 设备物理ID
+//    public static String deviceId = "124412";
     public static String deviceId = getSystemPropertiesByKey("ro.serialno");
     // 服务器IP地址
-    public static String serverIpAddress = "http://113.44.214.28:28080/admin-api/pcmanager/arithmetic";
+    public static String serverIpAddress = "http://192.168.2.16:48080/admin-api/pcmanager/arithmetic";
+    public static Integer TaskStatus = 0;//0 设备下线 1 设备上线 2 任务开始 3 任务暂停
+
+//    public static String serverIpAddress = "http://113.44.214.28:28080/admin-api/pcmanager/arithmetic";
     // 设备IMEI
 //    private static String IMEI = getSystemPropertiesByKey("persist.telephony.imei1");
     // 设备SN
@@ -22,6 +26,7 @@ public class Config {
     private static Context sContext;
 
     public static void init(Context context) {
+        TaskStatus = 1;
         // 初始化sContext
         if (context == null) {
             throw new IllegalArgumentException("context 不能为 null");

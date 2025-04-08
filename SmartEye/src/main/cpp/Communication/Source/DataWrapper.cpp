@@ -16,10 +16,12 @@ void DataWrapper::wrapYGIData(std::shared_ptr<YGIData> ygiData, int32_t& output_
     double lat = 0;
     double lng = 0;
     double speed = 0;
+    double altitude = 0;
     if (ygiData->getGpsVector()->size() > 0) {
         lat = ygiData->getGpsVector()->at(0)->getLat();
         lng = ygiData->getGpsVector()->at(0)->getLng();
         speed = ygiData->getGpsVector()->at(0)->getSpeed();
+        altitude = ygiData->getGpsVector()->at(0)->getAltitude();
     }
     char gpsInfo[32];
     sprintf(gpsInfo, "%.8f", lat);
@@ -28,6 +30,8 @@ void DataWrapper::wrapYGIData(std::shared_ptr<YGIData> ygiData, int32_t& output_
     info.append(",\"lng\":").append(gpsInfo);
     sprintf(gpsInfo, "%.2f", speed);
     info.append(",\"speed\":").append(gpsInfo);
+    sprintf(gpsInfo, "%.8f", altitude);
+    info.append(",\"altitude\":").append(gpsInfo);
     info.append("}");
 //    auto vioResult = ygiData->getVioResult()->info;
     int vioLength =  info.length();
