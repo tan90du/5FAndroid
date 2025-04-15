@@ -35,6 +35,7 @@ if (NOT IS_COMPILED_THIRD_PARTY_LIB)
     message(status  "PLATFORM_WIN:${PLATFORM_WIN}")
 
     set(_INCLUDE_HPSocket_ NO CACHE STRING DOCSTRING FORCE)
+    set(_INCLUDE_JPEG_TURBO NO CACHE STRING DOCSTRING FORCE)
 
 
     ADD_DEFINITIONS(-DHAVE_POSIX_FILEMAP)
@@ -49,6 +50,7 @@ if (NOT IS_COMPILED_THIRD_PARTY_LIB)
     message(status  "添加HPSocket")
 
     ADD_SUBDIRECTORY(./HPSocket)
+    ADD_SUBDIRECTORY(./libjpeg-turbo)
 
     SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}  -Winconsistent-missing-override")
 
@@ -59,6 +61,7 @@ if (NOT IS_COMPILED_THIRD_PARTY_LIB)
         target_link_libraries(SmartEye_ThirdParty
                 -Wl,--whole-archive
 #                ${WGS2GCJ_LIBRARIES}
+                ${JPEG_LIBRARIES}
                 HpSocket_static
                 -Wl,--no-whole-archive
                 )

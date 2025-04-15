@@ -17,12 +17,15 @@ include_directories(${HEADER_DIRECTORY}
         ./ThirdPartyLib/HPSocket/src/common/crypto
         ./ThirdPartyLib/HPSocket/src/common/http
         ./ThirdPartyLib/HPSocket/src/common/kcp
+        ./ThirdPartyLib/Common/Export_Inc
+        ./BaseLayer/JpegWrapper/Export_Inc
 
 )
 
 ADD_SUBDIRECTORY(./ThirdPartyLib)
-
 ADD_SUBDIRECTORY(./Communication)
+add_subdirectory(./BaseLayer/JpegWrapper JpegWrapper.out)
+
 #编译三方库
 
 file(GLOB_RECURSE SRCS sources/*.cpp
@@ -43,6 +46,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/libs/arm64-v8a/libhdclient.so
         Communication_static
 #        SmartEye_ThirdParty
+        JpegWrapper_static
         libSmartEye_ThirdParty.so
         android
         log

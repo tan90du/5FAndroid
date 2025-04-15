@@ -4,43 +4,56 @@ import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 
-import com.autonavi.smarteye.util.SDCardTool;
+import com.autonavi.smarteye.util.sdcard.SDCardTool;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 
 public class Config {
-    // 设备物理ID
-//    public static String deviceId = "124412";
+    private static final String TAG = "Config";
+    // 设备物理ID。这里使用SN编号作为物理ID
     public static String deviceId = getSystemPropertiesByKey("ro.serialno");
     // 服务器IP地址
-    public static String serverIpAddress = "http://192.168.2.16:48080/admin-api/pcmanager/arithmetic";
-    public static Integer TaskStatus = 0;//0 设备下线 1 设备上线 2 任务开始 3 任务暂停
-
-//    public static String serverIpAddress = "http://113.44.214.28:28080/admin-api/pcmanager/arithmetic";
-    // 设备IMEI
-//    private static String IMEI = getSystemPropertiesByKey("persist.telephony.imei1");
-    // 设备SN
-//    private static String SN = getSystemPropertiesByKey("ro.serialno");
+    public static String ip = "http://36.137.19.162:48080";
+    public static String serverIpAddress = ip + "/admin-api/pcmanager/arithmetic";
+    // 云服务器地址
+    public static String cloudServerIpAddress = "http://36.134.115.63:9001/api";
+    // 任务是否开启 flag
+    public static volatile String taskStatus = "pause"; // open, pause
     // 全局Context
     private static Context sContext;
 
     public static void init(Context context) {
-        TaskStatus = 1;
         // 初始化sContext
         if (context == null) {
-            throw new IllegalArgumentException("context 不能为 null");
+            Log.e(TAG, "context 不能为 null");
         }
         sContext = context.getApplicationContext();
 
         // 初始化SDCard读写权限
         if (SDCardTool.checkPermissions()) {
         } else SDCardTool.requestPermissions();
+
+        String originalPath = "/storage/ext4_sdcard/Android/data/img/original";
+        String markedPath = "/storage/ext4_sdcard/Android/data/img/marked";
+        File originalDir = new File(originalPath);
+        File markedDir = new File(markedPath);
+        if (!originalDir.exists() || !originalDir.isDirectory()) {
+            if (originalDir.mkdirs()) {
+                Log.i(TAG, "创建文件夹 " + originalDir);
+            }
+        }
+        if (!markedDir.exists() || !markedDir.isDirectory()) {
+            if (markedDir.mkdirs()) {
+                Log.i(TAG, "创建文件夹 " + markedDir);
+            }
+        }
     }
 
     public static Context getContext() {
         if (sContext == null) {
-            throw new IllegalStateException("Config 尚未初始化，请在 Application.onCreate() 中调用 Config.init(context)");
+            Log.e(TAG, "Config 尚未初始化，请在 Application.onCreate() 中调用 Config.init(context)");
         }
         return sContext;
     }
@@ -53,7 +66,7 @@ public class Config {
             Method method = clazz.getMethod("get", String.class);
             deviceType = (String) method.invoke(null, key);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "" + e);
         }
         return deviceType;
     }

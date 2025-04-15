@@ -1,14 +1,17 @@
 package com.autonavi.smarteye.service;
+
 import android.util.Log;
+
 import com.autonavi.smarteye.config.Config;
+import com.autonavi.smarteye.service.http.HttpCallback;
 import com.autonavi.smarteye.service.http.HttpClient;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -16,19 +19,39 @@ import java.util.List;
  */
 public class DataLoader {
     private static final String TAG = "DataLoader";
-    public static final String ipAddress = Config.serverIpAddress;
+    private static final String ipAddress = Config.serverIpAddress;
     private static final String deviceId = Config.deviceId;
-    public static Double pointLat=0.0;
-    public static Double pointLng=0.0;
+    private static List<List<String>> fenceList = null;
+    private static volatile double pointLng = 0.0; // 经度
+    private static volatile double pointLat = 0.0; // 纬度
+    private static long lastSendLocationTime;
+
+    static {
+        Calendar calendar = Calendar.getInstance();
+        long timestamp = calendar.getTimeInMillis();
+        lastSendLocationTime = timestamp;
+    }
+
+
     /**
      * 获取设备关联的病害母库清单
      *
      * @return 病害母库清单
      */
-    public static String getDiseaseLibrary() throws IOException {
+    public static String getDiseaseLibrary() {
         String requestUrl = ipAddress + "/get/library/list";
-        String response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
-        Log.i("DataLoader", "getDiseaseLibrary 响应内容: " + response);
+        String response = null;
+        int successCode = -1;
+        while (successCode != 0) {
+            try {
+                response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
+                JsonObject jsonObj = JsonParser.parseString(response).getAsJsonObject();
+                successCode = jsonObj.get("code").getAsInt();
+            } catch (Exception e) {
+                Log.e(TAG, "获取病毒母库列表失败 " + e);
+            }
+        }
+        Log.i(TAG, "病毒母库列表 " + response);
         return response;
     }
 
@@ -37,31 +60,52 @@ public class DataLoader {
      *
      * @return 设备电子围栏坐标数据（多边形坐标点集合）
      */
-    public static String getCoordinatePosition() throws IOException {
+    public static String getFenceList() {
         String requestUrl = ipAddress + "/get/fence/list";
-        String response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
-        Log.i("DataLoader", "getCoordinatePosition 响应内容: " + response);
+        String response = null;
+        try {
+            response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
+        } catch (Exception e) {
+            Log.e(TAG, "电子围栏列表出错 " + e);
+        }
+        Log.i(TAG, "电子围栏列表 " + response);
         return response;
     }
 
-    /**192.168.2.16:48080
+    /**
      * 设备位置上报
      *
      * @return 上报设备的实时地理位置
      */
-    public static String getDeviceLocation(String location){
+    public static String sendDeviceLocation(String location) {
         String requestUrl = ipAddress + "/location/reporting";
         String[] sp = location.split(",");
-        pointLat = Double.parseDouble(sp[0]);
-        pointLng = Double.parseDouble(sp[1]);
-        String response = null;
-        try {
-            String json = "{\"mac\":\""+deviceId+"\",\"location\":"+location+"\"}";
-            response = HttpClient.fetchDataSync(requestUrl, "POST",json);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        pointLng = Double.parseDouble(sp[0]);
+        pointLat = Double.parseDouble(sp[1]);
+
+        // 每 5 秒上传一次
+        Calendar calendar = Calendar.getInstance();
+        long timestamp = calendar.getTimeInMillis();
+        if (pointLng <= 180 && pointLat <= 90 && timestamp - lastSendLocationTime >= 5000) {
+            try {
+                String json = "{\"mac\":\"" + deviceId + "\",\"location\":\"" + location + "\"}";
+                HttpClient.fetchDataAsync(requestUrl, "POST", json, new HttpCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Log.i(TAG, "设备位置上报成功");
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.e(TAG, "设备位置上报出错 " + e);
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "设备位置上报出错 " + e);
+            }
+            lastSendLocationTime = timestamp;
         }
-        return response;
+        return "";
     }
 
     /**
@@ -69,15 +113,15 @@ public class DataLoader {
      *
      * @return 设备开机标记设备为在线状态
      */
-    public static String getOnlineMessage(){
+    public static String sendOnlineMessage() {
         String requestUrl = ipAddress + "/online";
         String response = null;
         try {
             response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            Log.e(TAG, "设备位置上报出错 " + e);
         }
-        Log.i("DataLoader", "getOnlineMessage 响应内容: " + response);
+//        System.out.println("位置" + response);
         return response;
     }
 
@@ -86,130 +130,205 @@ public class DataLoader {
      *
      * @return 设备关机标记设备为离线状态
      */
-    public static String getOfflineMessage() throws IOException {
+    public static void sendOfflineMessage() {
         String requestUrl = ipAddress + "/offline";
-        String response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
-        Log.i("DataLoader", "getOfflineMessage 响应内容: " + response);
-        return response;
+        try {
+            HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * 任务开始
+     */
+    public static void taskStart() {
+        String requestUrl = ipAddress + "/task/start";
+        try {
+            HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * 任务暂停
+     */
+    public static void taskPause() {
+        String requestUrl = ipAddress + "/task/pause";
+        try {
+            HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
+        } catch (Exception e) {
+        }
+    }
+
+    /**
+     * 计算坡度信息并上传
+     *
+     * @param req
+     * @return
+     */
+    public static void calculateAndSendSlope(String req) {
+        String requestUrl = Config.cloudServerIpAddress + "/calculate_slope";
+        HttpClient.fetchDataAsync(requestUrl, "POST", req, new HttpCallback() {
+            @Override
+            public void onSuccess(String result) {
+                JsonObject jsonObj = JsonParser.parseString(result).getAsJsonObject();
+                String resultCode = jsonObj.get("resultCode").getAsString();
+                if (!"0".equals(resultCode)) {
+                    Log.e(TAG, "坡度计算失败");
+                } else {
+                    // 上传坡度信息
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e(TAG, "坡度计算失败");
+            }
+        });
     }
 
     /**
      * 获取坡度配置列表
      *
-     * @return  获取道路坡度检测配置参数
+     * @return 获取道路坡度检测配置参数
      */
-    public static String getSlopeList() throws IOException {
+    public static String getSlopeList() {
         String requestUrl = ipAddress + "/get/slope/list";
-        String response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
-        Log.i("DataLoader", "getSlopeList 响应内容: " + response);
+        String response = null;
+        try {
+            response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
+        } catch (Exception e) {
+            Log.e(TAG, "获取坡度配置列表出错 " + e);
+        }
+        Log.i(TAG, "Method… " + response);
         return response;
     }
 
     /**
-     * 设备进入电子围栏自动开始任务
+     * 判断是否进入电子围栏区域
      *
      * @return 是否进入电子围栏
      */
-    public static boolean getStartTask(){
-//        String requestUrl = ipAddress + "/task/start";
-//        String response = HttpClient.fetchDataSync(requestUrl, "GET", "?mac=" + deviceId);
-        String response = "";
-//        double pointLat = Double.parseDouble(sp[0]);
-//        double pointLng = Double.parseDouble(sp[1]);
+    public static boolean isAccessFence() {
+        if (null == fenceList) {
+            String response = getFenceList();
+            JsonObject jsonObj = JsonParser.parseString(response).getAsJsonObject();
+            JsonArray dataArray = jsonObj.getAsJsonArray("data");
 
-        double pointLat = 2.0;
-        double pointLng = 3.0;
-        // 按照封闭图形的顺序给坐标点
-        Point p1 = new Point(1,1);
-        Point p2 = new Point(1,5);
-        Point p3 = new Point(5,5);
-        Point p4 = new Point(5,1);
-
-        List<Point> fences = new ArrayList<>();
-        fences.add(p1);
-        fences.add(p2);
-        fences.add(p3);
-        fences.add(p4);
-
-        //判断是否进入电子围栏
-        if(isPointInFence(pointLat,pointLng,fences)){
-            // 启动任务
-            Log.i("DataLoader", "当前位置在电子围栏中，启动任务: " + String.valueOf(pointLat)+","+String.valueOf(pointLng));
-            return true;
-        }else {
-            Log.i("DataLoader", "当前位置不在电子围栏中，不启动任务: " + String.valueOf(pointLat)+","+String.valueOf(pointLng));
-            return false;
-        }
-    }
-    public static boolean isPointInFence(double pointLat, double pointLng, List<Point> fences) {
-        // 坐标转换（解决纬度在前经度在后的常见问题）
-        double px = pointLng; // X轴对应经度
-        double py = pointLat; // Y轴对应纬度
-
-        // 验证多边形有效性
-        if (fences.size() < 3) return false;
-
-        // 边界点检查（包含在边上的情况）
-        for (int j = 0; j < fences.size(); j++) {
-            int next = (j + 1) % fences.size();
-            if (isPointOnSegment(new Point(px, py), fences.get(j), fences.get(next))) {
-                return true;
+            fenceList = new ArrayList<>();
+            for (JsonElement element : dataArray) {
+                JsonArray subArray = element.getAsJsonArray();
+                List<String> subList = new ArrayList<>();
+                for (JsonElement strElem : subArray) {
+                    subList.add(strElem.getAsString());
+                }
+                fenceList.add(subList);
             }
         }
 
-        // 射线法核心算法
+        //判断是否进入电子围栏
+        if (isPointInFence(pointLng, pointLat, fenceList)) {
+            // 启动任务
+            Log.i(TAG, "当前位置 经度 " + pointLng + " 纬度 " + pointLat + " 在电子围栏中，任务运行");
+            return true;
+        } else {
+            Log.i(TAG, "当前位置 经度 " + pointLng + " 纬度 " + pointLat + " 不在电子围栏中，任务暂停");
+            return false;
+        }
+    }
+
+    /**
+     * 判断给定点 (pointLng, pointLat) 是否在任意一个电子围栏区域内
+     *
+     * @param pointLng  点的经度
+     * @param pointLat  点的纬度
+     * @param fenceList 电子围栏列表，每个子 List 表示一个区域，区域中的每个元素为 "经度,纬度" 字符串
+     * @return 如果点在任何一个区域内，返回 true；否则返回 false
+     */
+    private static boolean isPointInFence(double pointLng, double pointLat, List<List<String>> fenceList) {
+        if (pointLng <= 180.0 && pointLat <= 90.0) {
+            for (List<String> fence : fenceList) {
+                if (isPointInPolygon(pointLng, pointLat, fence)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 利用射线法判断点是否在多边形内部，并补充判断点是否在多边形边上
+     *
+     * @param pointLng 点的经度
+     * @param pointLat 点的纬度
+     * @param fence    多边形顶点坐标列表，格式为 "经度,纬度"
+     * @return 如果点在多边形内部或恰好在多边形边上，返回 true，否则返回 false
+     */
+    private static boolean isPointInPolygon(double pointLng, double pointLat, List<String> fence) {
+        if (fence.isEmpty()) {
+            return false;
+        }
+        List<String> polygonPoints = new ArrayList<>(fence);
+        // 保证多边形闭合：若首尾不一致，则加入首点
+        if (!polygonPoints.get(0).equals(polygonPoints.get(polygonPoints.size() - 1))) {
+            polygonPoints.add(polygonPoints.get(0));
+        }
+
         boolean inside = false;
-        for (int j = 0; j < fences.size(); j++) {
-            int next = (j + 1) % fences.size();
-            Point a = fences.get(j);
-            Point b = fences.get(next);
+        int n = polygonPoints.size();
+        for (int i = 0; i < n - 1; i++) {
+            String[] coord1 = polygonPoints.get(i).split(",");
+            double lng1 = Double.parseDouble(coord1[0]);
+            double lat1 = Double.parseDouble(coord1[1]);
 
-            // 坐标转换
-            double ax = a.getLng(), ay = a.getLat();
-            double bx = b.getLng(), by = b.getLat();
+            String[] coord2 = polygonPoints.get(i + 1).split(",");
+            double lng2 = Double.parseDouble(coord2[0]);
+            double lat2 = Double.parseDouble(coord2[1]);
 
-            // 排除水平边
-            if (Math.abs(ay - by) < 1e-10) continue;
+            // 先判断点是否在当前线段上
+            if (isPointOnLineSegment(pointLng, pointLat, lng1, lat1, lng2, lat2)) {
+                return true;
+            }
 
-            // 确保射线只与向上或向下的边相交
-            if (((ay > py) != (by > py)) &&
-                    (px < (bx - ax) * (py - ay) / (by - ay) + ax)) {
+            // 射线法判定：判断点与边的相交情况
+            if (((lat1 > pointLat) != (lat2 > pointLat)) &&
+                    (pointLng < (lng2 - lng1) * (pointLat - lat1) / (lat2 - lat1) + lng1)) {
                 inside = !inside;
             }
         }
         return inside;
     }
 
-    // 增强版的点在线段判断
-    private static boolean isPointOnSegment(Point p, Point a, Point b) {
-        // 坐标转换
-        double px = p.getLng(), py = p.getLat();
-        double ax = a.getLng(), ay = a.getLat();
-        double bx = b.getLng(), by = b.getLat();
-
-        // 快速排除
-        if (px < Math.min(ax, bx) - 1e-10 || px > Math.max(ax, bx) + 1e-10) return false;
-        if (py < Math.min(ay, by) - 1e-10 || py > Math.max(ay, by) + 1e-10) return false;
-
-        // 方向向量验证
+    /**
+     * 判断点 (px, py) 是否在线段 (ax, ay) 到 (bx, by) 上。
+     * 注意：这里采用一定的容差值 tolerance，避免浮点计算误差。
+     *
+     * @param px 点的经度
+     * @param py 点的纬度
+     * @param ax 线段起点的经度
+     * @param ay 线段起点的纬度
+     * @param bx 线段终点的经度
+     * @param by 线段终点的纬度
+     * @return 如果点在线段上则返回 true，否则返回 false
+     */
+    private static boolean isPointOnLineSegment(double px, double py,
+                                                double ax, double ay,
+                                                double bx, double by) {
+        // 计算向量叉乘是否接近0（在直线上），容差值可根据实际需求调整
+        double tolerance = 1e-9;
         double cross = (px - ax) * (by - ay) - (py - ay) * (bx - ax);
-        return Math.abs(cross) < 1e-10;
-    }
-
-    // 更健壮的Point类
-    public static class Point {
-        private final double lat;  // 纬度(Y)
-        private final double lng;  // 经度(X)
-
-        public Point(double lng, double lat) {
-            this.lat = lat;
-            this.lng = lng;
+        if (Math.abs(cross) > tolerance) {
+            return false;
         }
-
-        public double getLat() { return lat; }
-        public double getLng() { return lng; }
+        // 判断 px,py 是否在线段 [ax, bx] 与 [ay, by] 的范围内
+        double dot = (px - ax) * (bx - ax) + (py - ay) * (by - ay);
+        if (dot < 0) {
+            return false;
+        }
+        double squaredLen = (bx - ax) * (bx - ax) + (by - ay) * (by - ay);
+        if (dot > squaredLen) {
+            return false;
+        }
+        return true;
     }
-
-
-
 }

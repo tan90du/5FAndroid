@@ -114,27 +114,32 @@ void Communication::init(OnAcceptCallBack callback){
             }
         }
 
+
         // 4. 解析文件数量
         int fileCount;
         memcpy(&fileCount, byteData + offset, 4);
         offset += 4;
 
-        // 创建本地存储目录
-        const std::string baseSavePath = "/storage/ext4_sdcard/Android/data/img/marked/";
-        std::string fullPath = baseSavePath + folderName;
-        if (!createDirectory(fullPath)) {
-            Log::info("FileSave", "Failed to create directory: %s", fullPath.c_str());
-            return;
+        // 检查是否存在 marked_info.json
+        bool hasMarkedInfo = (std::find(fileNames.begin(), fileNames.end(), "marked_info.json") != fileNames.end());
+
+        // 创建 marked 目录（如果需要）
+        std::string fullPath;
+        if (hasMarkedInfo) {
+            const std::string baseSavePath = "/storage/ext4_sdcard/Android/data/img/marked/";
+            fullPath = baseSavePath + folderName;
+            if (!createDirectory(fullPath)) {
+                Log::info("FileSave", "Failed to create marked directory: %s", fullPath.c_str());
+                hasMarkedInfo = false; // 标记为不保存到 marked 路径
+            }
         }
-//        // 假设任务开启时间为 20250401-0810，如果间隔10分钟更新时间，会创建新的文件夹 20250401-0820，用于视频帧的保存
-//        std::string time =
-//                CxxCallJavaHelper::call("getCurrentFormattedTime", "");
-//// 保存采集的原始图像到original文件夹。 /storage/ext4_sdcard/Android/data/img/original/20250401-0810/
-//        std::string dirPath =
-//                CxxCallJavaHelper::call("getAppSDCardPath", "") + "img/original/" + time + "/";
-//        // 创建文件存储目录
-//        const std::string originalBasePath = dirPath;
-        const std::string originalBasePath = "/storage/ext4_sdcard/Android/data/img/original/";
+        // 假设任务开启时间为 20250401-0810，如果间隔10分钟更新时间，会创建新的文件夹 20250401-0820，用于视频帧的保存
+        std::string time =
+                CxxCallJavaHelper::call("getCurrentFormattedTime", "");
+        // 保存采集的原始图像到original文件夹。 /storage/ext4_sdcard/Android/data/img/original/20250401-0810/
+        std::string originalBasePath =
+                CxxCallJavaHelper::call("getAppSDCardPath", "") + "img/original/" + time + "/";
+
         if (!createDirectory(originalBasePath)) {
             Log::info("FileSave", "Failed to create original directory: %s", originalBasePath.c_str());
         }
@@ -151,46 +156,49 @@ void Communication::init(OnAcceptCallBack callback){
             // 检查数据边界
             if (offset + fileSize > length) break;
 
-            // 写入文件
-            std::string filename = fullPath + "/" + fileNames[i];
-            FILE* fp = fopen(filename.c_str(), "wb");
-            if (fp) {
-                fwrite(byteData + offset, 1, fileSize, fp);
-                fclose(fp);
-                Log::info("FileSave", "Saved: %s (%d bytes)", filename.c_str(), fileSize);
-            } else {
-                Log::info("FileSave", "Failed to write: %s", filename.c_str());
-            }
-            // 额外保存到原始目录（如果符合条件）
-            if (fileNames[i].size() >= 13 &&
-                fileNames[i].compare(fileNames[i].size() - 13, 13, "_original.jpg") == 0) {
-
+            // 保存到 original 路径（如果文件名以 _original.jpg 结尾）
+            bool isOriginal = (fileNames[i].size() >= 13) &&
+                              (fileNames[i].compare(fileNames[i].size() - 13, 13, "_original.jpg") == 0);
+            if (isOriginal) {
                 std::string originalFilePath = originalBasePath + fileNames[i];
-
                 // 确保父目录存在
                 size_t lastSlashPos = originalFilePath.find_last_of('/');
                 if (lastSlashPos != std::string::npos) {
                     std::string parentDir = originalFilePath.substr(0, lastSlashPos);
                     if (!createDirectory(parentDir)) {
-                        Log::info("FileSave", "Failed to create directory for original file: %s", parentDir.c_str());
-                        // 继续尝试保存文件
+                        Log::info("FileSave", "Failed to create original parent directory: %s", parentDir.c_str());
                     }
                 }
-
                 FILE* original_fp = fopen(originalFilePath.c_str(), "wb");
                 if (original_fp) {
                     fwrite(byteData + offset, 1, fileSize, original_fp);
                     fclose(original_fp);
-                    Log::info("FileSave", "Saved original file: %s (%d bytes)", originalFilePath.c_str(), fileSize);
+                    Log::info("FileSave", "Saved original: %s (%d bytes)", originalFilePath.c_str(), fileSize);
                 } else {
-                    Log::info("FileSave", "Failed to write original file: %s", originalFilePath.c_str());
+                    Log::info("FileSave", "Failed to save original: %s", originalFilePath.c_str());
+                }
+            }
+
+            // 保存到 marked 路径（如果存在 marked_info.json）
+            if (hasMarkedInfo) {
+                std::string markedFilePath = fullPath + "/" + fileNames[i];
+                FILE* fp = fopen(markedFilePath.c_str(), "wb");
+                if (fp) {
+                    fwrite(byteData + offset, 1, fileSize, fp);
+                    fclose(fp);
+                    Log::info("FileSave", "Saved marked: %s (%d bytes)", markedFilePath.c_str(), fileSize);
+                } else {
+                    Log::info("FileSave", "Failed to save marked: %s", markedFilePath.c_str());
                 }
             }
 
             offset += fileSize;
         }
 
-        Log::info("FileSave", "接收到 %d 个文件，在文件夹: %s中", fileCount, folderName.c_str());
+// 记录接收日志（仅在保存到 marked 时）
+        if (hasMarkedInfo) {
+            Log::info("FileSave", "Received %d files in folder: %s", fileCount, folderName.c_str());
+        }
     });
 
     // 建议每30秒检测下 上次获取版本号的时间 若超时则 重新创建server

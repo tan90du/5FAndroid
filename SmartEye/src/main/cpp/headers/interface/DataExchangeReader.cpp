@@ -40,7 +40,7 @@ DataExchangeFrame* ReaderQueryFrameByOffset(void* buf, int32_t offset) {
     }
 	DataExchangeFrame* result = NULL;
 	if (header->frames.cur - offset > 20) {
-		Log::info("ReaderQueryFrameByOffset", "header->frames.cur - offset = %d", header->frames.cur - offset);
+//		Log::info("ReaderQueryFrameByOffset", "header->frames.cur - offset = %d", header->frames.cur - offset);
 	}
 //	PROCESS_ERROR(offset < header->frames.cur);
 if(offset < header->frames.cur) {
@@ -420,13 +420,13 @@ void parseGNGGA(const std::string &gnggaStr, SmartGPS *smartGps) {
 			case 2: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setLat(-999999);
+						smartGps->setLat(999999);
 					} else {
 						double y = std::stod(vec.at(i));
 						smartGps->setLat((int)y/100 + fmod(y, 100)/60.0);
 					}
 				} catch (...) {
-					smartGps->setLat(-999999);
+					smartGps->setLat(999999);
 				}
 
 				break;
@@ -435,13 +435,13 @@ void parseGNGGA(const std::string &gnggaStr, SmartGPS *smartGps) {
 			case 4: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setLng(-999999);
+						smartGps->setLng(999999);
 					} else {
 						double x = std::stod(vec.at(i));
 						smartGps->setLng((int)x/100 + fmod(x, 100)/60.0);
 					}
 				} catch (...) {
-					smartGps->setLng(-999999);
+					smartGps->setLng(999999);
 				}
 
 				break;
@@ -450,13 +450,13 @@ void parseGNGGA(const std::string &gnggaStr, SmartGPS *smartGps) {
 			case 6: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setGpsStatus(-999999);
+						smartGps->setGpsStatus(999999);
 					} else {
 						int gpsStatus = std::stoi(vec.at(i));
 						smartGps->setGpsStatus(gpsStatus);
 					}
 				} catch (...) {
-					smartGps->setGpsStatus(-999999);
+					smartGps->setGpsStatus(999999);
 				}
 
 				break;
@@ -465,13 +465,13 @@ void parseGNGGA(const std::string &gnggaStr, SmartGPS *smartGps) {
 			case 7: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setGpsNum(-999999);
+						smartGps->setGpsNum(999999);
 					} else {
 						int gpsNumber = std::stoi(vec.at(i));
 						smartGps->setGpsNum(gpsNumber);
 					}
 				} catch (...) {
-					smartGps->setGpsNum(-999999);
+					smartGps->setGpsNum(999999);
 				}
 				break;
 			}
@@ -479,13 +479,13 @@ void parseGNGGA(const std::string &gnggaStr, SmartGPS *smartGps) {
 			case 8: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setHdop(-999999);
+						smartGps->setHdop(999999);
 					} else {
 						double hdop = std::stof(vec.at(i));
 						smartGps->setHdop(hdop);
 					}
 				} catch (...) {
-					smartGps->setHdop(-999999);
+					smartGps->setHdop(999999);
 				}
 				break;
 			}
@@ -493,14 +493,14 @@ void parseGNGGA(const std::string &gnggaStr, SmartGPS *smartGps) {
 			case 9: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setAltitude(-999999);
+						smartGps->setAltitude(999999);
 					} else {
 						double height = std::stof(vec.at(i));
 						double geoidSep = std::stof(vec.at(i + 2));
 						smartGps->setAltitude(height + geoidSep);
 					}
 				} catch (...) {
-					smartGps->setAltitude(-999999);
+					smartGps->setAltitude(999999);
 				}
 				break;
 			}
@@ -524,7 +524,7 @@ void parseGNRMC(const std::string &gpgstStr, SmartGPS *smartGps) {
 			case 7: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setSpeed(-999999);
+						smartGps->setSpeed(999999);
 					} else {
 						double speed = std::stof(vec.at(i));
 						// 海里转成 m/s
@@ -532,7 +532,7 @@ void parseGNRMC(const std::string &gpgstStr, SmartGPS *smartGps) {
 					}
 				} catch (...) {
 					// catch 块
-					smartGps->setSpeed(-999999);
+					smartGps->setSpeed(999999);
 				}
 				break;
 			}
@@ -540,14 +540,14 @@ void parseGNRMC(const std::string &gpgstStr, SmartGPS *smartGps) {
 			case 8: {
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						smartGps->setBearing(-999999);
+						smartGps->setBearing(999999);
 					} else {
 						double course = std::stof(vec.at(i));
 						smartGps->setBearing(course);
 					}
 				} catch (...) {
 					// catch 块
-					smartGps->setBearing(-999999);
+					smartGps->setBearing(999999);
 				}
 				break;
 			}
@@ -576,13 +576,13 @@ void parseGPGST(const std::string &gpgstStr, SmartGPS *smartGps) {
 				double latErrorDeviation = 0.0;
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						latErrorDeviation = -999999;
+						latErrorDeviation = 999999;
 					} else {
 						latErrorDeviation = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					latErrorDeviation = -999999;
+					latErrorDeviation = 999999;
 				}
 				smartGps->setLatErrorDeviation(latErrorDeviation);
 				break;
@@ -592,13 +592,13 @@ void parseGPGST(const std::string &gpgstStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						lngErrorDeviation = -999999;
+						lngErrorDeviation = 999999;
 					} else {
 						lngErrorDeviation = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					lngErrorDeviation = -999999;
+					lngErrorDeviation = 999999;
 				}
 
 				smartGps->setLngErrorDeviation(lngErrorDeviation);
@@ -615,12 +615,12 @@ void parseGPGST(const std::string &gpgstStr, SmartGPS *smartGps) {
 						altErrorDeviation = std::stof(subVec.at(0));
 					} catch (...) {
 						// catch 块
-						altErrorDeviation = -999999;
+						altErrorDeviation = 999999;
 					}
 
 					smartGps->setAltErrorDeviation(altErrorDeviation);
 				} else {
-					smartGps->setAltErrorDeviation(-999999);
+					smartGps->setAltErrorDeviation(999999);
 					Log::info("parseGPGST", "最后一个元素为空");
 				}
 
@@ -650,13 +650,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 				double Cxx = 0.0;
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Cxx = -999999;
+						Cxx = 999999;
 					} else {
 						Cxx = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Cxx = -999999;
+					Cxx = 999999;
 				}
 
 				smartGps->setCxx(Cxx);
@@ -667,13 +667,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Cxy = -999999;
+						Cxy = 999999;
 					} else {
 						Cxy = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Cxy = -999999;
+					Cxy = 999999;
 				}
 
 				smartGps->setCxy(Cxy);
@@ -683,7 +683,7 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 				double Cxz = 0.0;
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Cxz = -999999;
+						Cxz = 999999;
 					} else {
 						Cxz = std::stof(vec.at(i));
 					}
@@ -700,14 +700,14 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Cyy = -999999;
+						Cyy = 999999;
 					} else {
 						Cyy = std::stof(vec.at(i));
 					}
 
 				} catch (...) {
 					// catch 块
-					Cyy = -999999;
+					Cyy = 999999;
 				}
 				smartGps->setCyy(Cyy);
 				break;
@@ -717,13 +717,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Cyz = -999999;
+						Cyz = 999999;
 					} else {
 						Cyz = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Cyz = -999999;
+					Cyz = 999999;
 				}
 				smartGps->setCyz(Cyz);
 				break;
@@ -732,13 +732,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 				double Czz = 0.0;
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Czz = -999999;
+						Czz = 999999;
 					} else {
 						Czz = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Czz = -999999;
+					Czz = 999999;
 				}
 				smartGps->setCzz(Czz);
 				break;
@@ -748,13 +748,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Vxx = -999999;
+						Vxx = 999999;
 					} else {
 						Vxx = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Vxx = -999999;
+					Vxx = 999999;
 				}
 
 				smartGps->setVxx(Vxx);
@@ -765,7 +765,7 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Vxy = -999999;
+						Vxy = 999999;
 					} else {
 						Vxy = std::stof(vec.at(i));
 					}
@@ -782,13 +782,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Vxz = -999999;
+						Vxz = 999999;
 					} else {
 						Vxz = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Vxz = -999999;
+					Vxz = 999999;
 				}
 
 				smartGps->setVxz(Vxz);
@@ -799,13 +799,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Vyy = -999999;
+						Vyy = 999999;
 					} else {
 						Vyy = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Vyy = -999999;
+					Vyy = 999999;
 				}
 
 				smartGps->setVyy(Vyy);
@@ -816,13 +816,13 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 
 				try {
 					if (strcmp("", vec.at(i).c_str()) == 0){
-						Vyz = -999999;
+						Vyz = 999999;
 					} else {
 						Vyz = std::stof(vec.at(i));
 					}
 				} catch (...) {
 					// catch 块
-					Vyz = -999999;
+					Vyz = 999999;
 				}
 				smartGps->setVyz(Vyz);
 				break;
@@ -839,12 +839,12 @@ void parseWZCOV(const std::string &wzcovStr, SmartGPS *smartGps) {
 						Vzz = std::stof(subVec.at(0));
 					} catch (...) {
 						// catch 块
-						Vzz = -999999;
+						Vzz = 999999;
 					}
 
 					smartGps->setVzz(Vzz);
 				} else {
-					smartGps->setVzz(-999999);
+					smartGps->setVzz(999999);
 					Log::info("parseWZCOV", "最后一个元素为空");
 				}
 				break;

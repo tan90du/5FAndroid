@@ -22,11 +22,15 @@
 #include <iostream>
 #include <cmath>
 #include <utility>
+#include "EncodeFrame2Jpeg.h"
+#include "functional"
+
 using namespace std;
 
 const double PI = 3.14159265358979324;
 
 static double transform_lat(double x, double y);
+
 static double transform_lon(double x, double y);
 
 pair<double, double> wgs84_to_gcj02(double lon, double lat) {
@@ -74,10 +78,10 @@ double transform_lon(double x, double y) {
     return ret;
 }
 
-double calSlope(double s1,double s2,double h1,double h2,double time){
-    double avgSpeed = (s1+s2)/2;
-    double distance = avgSpeed*time;
-    double slope = std::fabs(h1-h2)/distance*100;
+double calSlope(double s1, double s2, double h1, double h2, double time) {
+    double avgSpeed = (s1 + s2) / 2;
+    double distance = avgSpeed * time;
+    double slope = std::fabs(h1 - h2) / distance * 100;
     return slope;
 }
 
@@ -102,18 +106,14 @@ void serverDieCallback(void) {
     Log::info("DeviceSystem", "serverDieCallback!!!!!");
 }
 
-bool flag = 1;
-long pre = 0;
-double pre_speed = 0;
-double pre_h = 0;
-double now_speed = 0;
-double now_h = 0;
+// 病毒母库信息发送标记
+bool isSendDiseaseLibrary = false;
+// 记录最后一次发送位置上报时间
+std::chrono::steady_clock::time_point lastSendTime = std::chrono::steady_clock::now();
 
-bool flag_getDiseaseLibrary=1;
+void sendCustomJson(const std::string &jsonData) {
 
-void sendCustomJson(const std::string& jsonData) {
-
-    Communication* comm = Communication::getSingleton();
+    Communication *comm = Communication::getSingleton();
     if (!comm->connected()) {
         Log::info("Sender", "未连接到服务器，发送失败");
         return;
@@ -125,7 +125,7 @@ void sendCustomJson(const std::string& jsonData) {
 
     // 构造数据包：4字节类型 + 4字节JSON长度 + JSON内容
     const int totalSize = 4 + 4 + jsonLength;
-    unsigned char* buffer = new unsigned char[totalSize];
+    unsigned char *buffer = new unsigned char[totalSize];
     int offset = 0;
 
     // 填充数据类型
@@ -144,18 +144,22 @@ void sendCustomJson(const std::string& jsonData) {
 
     delete[] buffer;
     Log::info("Sender", "JSON数据已发送");
-    flag_getDiseaseLibrary=0;
 }
+
 /**
  * 保存视频帧到sdcard
  * @param ygiData
  * @param frameIndex
  */
-void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData, uint32_t frameIndex) {
+void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData) {
     SmartFrame *smartFrame = ygiData->getSmartFrame();
     if (smartFrame && smartFrame->getFrameData() != nullptr && smartFrame->getDataSize() > 0) {
-        //创建文件夹
-        std::string dirPath = CxxCallJavaHelper::call("getAppSDCardPath", "") + "img/";
+        // 假设任务开启时间为 20250401-0810，如果间隔10分钟更新时间，会创建新的文件夹 20250401-0820，用于视频帧的保存
+        std::string time =
+                CxxCallJavaHelper::call("getCurrentFormattedTime", "");
+        // 保存采集的原始图像到original文件夹。 /storage/ext4_sdcard/Android/data/img/original/20250401-0810/
+        std::string dirPath =
+                CxxCallJavaHelper::call("getAppSDCardPath", "") + "img/original/" + time + "/";
         DIR *dir = opendir(dirPath.c_str());
         if (dir) {
             closedir(dir);
@@ -164,8 +168,14 @@ void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData, uint32_t frameIndex) 
             cmd += dirPath;
             system(cmd.c_str());
         }
-        // 生成文件名，例如 frame_100.yuv
-        std::string filename = dirPath +  std::to_string(frameIndex) + ".yuv";
+
+        // 生成文件名，形如 timestamp-longitude-latitude-altitude-speed.yuv, 年月日-时分秒-微秒
+        std::string filename = dirPath +
+                               std::to_string(ygiData->getSmartFrame()->getTimestamp()) + "-" +
+                               std::to_string(ygiData->getGpsVector()->at(0)->getLng()) + "-" +
+                               std::to_string(ygiData->getGpsVector()->at(0)->getLat()) + "-" +
+                               std::to_string(ygiData->getGpsVector()->at(0)->getAltitude()) + "-" +
+                               std::to_string(ygiData->getGpsVector()->at(0)->getSpeed()) + ".yuv";
         // 打开文件进行二进制写入
         std::ofstream outFile(filename, std::ios::out | std::ios::binary);
         if (outFile.is_open()) {
@@ -181,12 +191,70 @@ void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData, uint32_t frameIndex) 
     }
 }
 
+// 运行在编码线程
+void DataReceiver::encodeFinish(int code, std::shared_ptr<YGIData> ygiData) {
+    /*if (mYgiDataMap == nullptr || code != 0){
+        return;
+    }
+    int static index = 0;
+
+    u8 t1 = TimeUtils::currentTimeMicrosecond();
+    // {"interval":2}
+    // 获取开机时长(毫秒)
+    struct timespec ts;
+    clock_gettime(CLOCK_BOOTTIME, &ts);
+    long long bootTime = (long long)ts.tv_sec * 1000 + (long long)(ts.tv_nsec/1000000);
+    bootTime *= 1000;
+    static u8 baseDiff = ygiData->getSmartFrame()->getTimestamp() - bootTime;
+    u8 currentDiff = ygiData->getSmartFrame()->getTimestamp() - bootTime;
+    u8 interval = baseDiff >= currentDiff ? baseDiff - currentDiff : currentDiff - baseDiff;
+    ygiData->getSmartFrame()->moreField.append("{\"interval\":")
+            .append(std::to_string(interval)).append("}");
+    // 质检
+    doYGIQuality(ygiData);
+    ST::SmartRecursiveLock lock(mutex, "YGIDataMemoryCache.encodeFinish");*/
+
+    Communication::getSingleton()->sendYGIData(ygiData);
+
+   /* ygiData->setStatus(EnumVIOStatus::Default);
+    auto *smartFrame = ygiData->getSmartFrame();
+
+    // 检查下当前的容量是否大于maxMemory 如果依然超出缓存 则强制移除最早的一个(这种情况一般为vio异常或者长时间堵车导致)
+    while (currentMemorySize + smartFrame->getLength() > mDataCacheParams.maxMemory){
+        // 移除最早的一帧
+        std::map<u8, std::shared_ptr<YGIData>>::iterator iterator = mYgiDataMap->begin();
+        currentMemorySize -= iterator->second->getSmartFrame()->getLength();
+//        Log::info("YGIDataMemoryCache", "缓存已满,删除了第一帧 %llu", iterator->first);
+        mYgiDataMap->erase(iterator);
+    }
+    // 添加到map的末尾
+    mYgiDataMap->insert(std::make_pair(smartFrame->getTimestamp(), ygiData));
+    // 将当前的size加上
+    currentMemorySize += smartFrame->getLength();
+    u8 t2 = TimeUtils::currentTimeMicrosecond();
+    if (index % 100 == 0 || (t2 - t1) > 2000){
+        Log::info("YGIDataMemoryCache", "size = %d, 耗时 %lld, moreField = %s",
+                  mYgiDataMap->size(), t2 - t1, ygiData->getSmartFrame()->moreField.c_str());
+    }
+    index++;
+    if (index > 100000){
+        index = 0;
+    }*/
+}
+
 
 /**
  * 帧回调处理
  * @param frameIndex
  */
 void frameDataCallback(uint32_t frameIndex) {
+
+    //发送病害母库列表
+//    if (!isSendDiseaseLibrary) {
+//        String diseaseList = CxxCallJavaHelper::call("getDiseaseLibrary", "");
+//        sendCustomJson(diseaseList.c_str());
+//        isSendDiseaseLibrary = true;
+//    }
 
     std::shared_ptr<YGIData> ygiData(new YGIData());
     HanderReaderFramebuf(frameIndex, shareBuf, ygiData);
@@ -196,113 +264,60 @@ void frameDataCallback(uint32_t frameIndex) {
     }
 
     if (!ygiData->getGpsVector()->empty()) {
-        Log::info("DataReceiver", "time = %lld, x = %.8f, y = %.8f, status = %d, Altitude = %.8f, speed = %.8f,",
+        //WGS84地图坐标转换成高德和百度地图坐标
+        auto gcj02 = wgs84_to_gcj02(ygiData->getGpsVector()->at(0)->getLng(),
+                                    ygiData->getGpsVector()->at(0)->getLat());
+//        Log::info("DataReceiver", "高德地图坐标x:%.8f,坐标y:%.8f", gcj02.first, gcj02.second);
+
+//        auto bd09 = gcj02_to_bd09(gcj02.first, gcj02.second);
+//        Log::info("DataReceiver", "百度地图坐标x:%.8f,坐标y:%.8f", bd09.first, bd09.second);
+
+        /*Log::info("DataReceiver",
+                  "time = %lld, x = %.8f, y = %.8f, status = %d, Altitude = %.8f, speed = %.8f,",
                   ygiData->getSmartFrame()->getTimestamp(),
                   ygiData->getGpsVector()->at(0)->getLng(),
                   ygiData->getGpsVector()->at(0)->getLat(),
                   ygiData->getGpsVector()->at(0)->getGpsStatus(),
                   ygiData->getGpsVector()->at(0)->getAltitude(),
                   ygiData->getGpsVector()->at(0)->getSpeed());
-        Log::info("DataReceiver", "ygiData 获取到一帧");
-
-//        std::string str = CxxCallJavaHelper::call("UpLoadImg", "");
+        Log::info("DataReceiver", "ygiData 获取到一帧");*/
 
         // 构造包含经纬度的JSON字符串
         char jsonStr[256];
-        snprintf(jsonStr, sizeof(jsonStr),
-                 R"(%.8f,%.8f)",
-                 ygiData->getGpsVector()->at(0)->getLng(),
-                 ygiData->getGpsVector()->at(0)->getLat());
-        String res = CxxCallJavaHelper::call("getDeviceLocation", jsonStr);
+//        double lng = ygiData->getGpsVector()->at(0)->getLng();
+//        double lat = ygiData->getGpsVector()->at(0)->getLat();
+        double lng = gcj02.first;
+        double lat = gcj02.second;
 
-        //WGS84地图坐标转换成高德和百度地图坐标
-        auto gcj02 = wgs84_to_gcj02(ygiData->getGpsVector()->at(0)->getLng(), ygiData->getGpsVector()->at(0)->getLat());
-        Log::info("DataReceiver", "高德地图坐标x:%.8f,坐标y:%.8f",gcj02.first,gcj02.second);
+        snprintf(jsonStr, sizeof(jsonStr), R"(%.8f,%.8f)", lng, lat);
+        std::string res = CxxCallJavaHelper::call("sendDeviceLocation", jsonStr);
 
-        auto bd09 = gcj02_to_bd09(gcj02.first, gcj02.second);
-        Log::info("DataReceiver", "百度地图坐标x:%.8f,坐标y:%.8f",bd09.first,bd09.second);
+        // 查询任务状态
+        std::string taskStatus = CxxCallJavaHelper::call("getTaskStatus", "");
 
-//        // 计算坡度
-//        double test = calSlope(6,10,6,10,2);
-//        Log::info("DataReceiver", "6 10 6 10 2 测试坡度为:%.8f%%",test);
-//        long time = ygiData->getSmartFrame()->getTimestamp()/100000;
-//        int interval = 2;
-//        if(flag){
-//            pre = time;
-//            pre_speed=ygiData->getGpsVector()->at(0)->getSpeed();
-//            pre_h=ygiData->getGpsVector()->at(0)->getAltitude();
-//            flag=0;
-//        }
-//        if(flag==0){
-//            if(time-pre>=interval){
-//                now_speed=ygiData->getGpsVector()->at(0)->getSpeed();
-//                now_h=ygiData->getGpsVector()->at(0)->getAltitude();
-//                double slope = calSlope(pre_speed,now_speed,pre_h,now_h,interval);
-//                Log::info("DataReceiver", "时间间隔为:%d",interval);
-//                Log::info("DataReceiver", "起点时间为:%lld",pre);
-//                Log::info("DataReceiver", "终点时间为:%lld",time);
-//                Log::info("DataReceiver", "起点速度为:%.8f",pre_speed);
-//                Log::info("DataReceiver", "终点速度为:%.8f",now_speed);
-//                Log::info("DataReceiver", "起点高度为:%.8f",pre_h);
-//                Log::info("DataReceiver", "终点高度为:%.8f",now_h);
-//                Log::info("DataReceiver", "坡度为:%.8f%%",slope);
-//                pre_speed=now_speed;
-//                pre_h=now_h;
-//                pre=time;
-//            }
-//        }
+        // 经纬度合法且任务开启时才进行逻辑处理
+        if (lng <= 180 && lat <= 90 && "open" == taskStatus) {
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    now - lastSendTime);
 
-        //发送病害母库列表
-        if(flag_getDiseaseLibrary==1){
-//            String res2 = CxxCallJavaHelper::call("getDiseaseLibrary", "");
-//            Log::info("DataReceiver", "getDiseaseLibrarylihongwei:%s",res2.c_str());
-            // 构造JSON字符串
-            std::string jsonStr = R"({
-              "code": 200,
-              "message": "成功",
-              "data": [
-                {
-                  "id": 1,
-                  "uniqueId": "病害唯一id",
-                  "pendingId": 1001,
-                  "equipmentId": 2001,
-                  "inspectionRecordId": 3001,
-                  "parentId": 0,
-                  "type": "类型1:端AI病害, 2:全量图片",
-                  "imageUrl": "图片地址",
-                  "diseaseType": "病害类型",
-                  "road": "道路",
-                  "location": "位置 经纬度",
-                  "direction": "病害方向",
-                  "quantity": "量化",
-                  "reportTime": "上报时间2025-04-01 11:03:47",
-                  "position": "病害标注信息",
-                  "highlightImageUrl": "已标注的照片",
-                  "diseaseStatus": "病害状态",
-                  "deptId": 123
-                }
-              ]
-            })";
+            if (elapsed.count() >= 200) { // 定时发送
+                // 发送合法图片到算力终端
+                Log::info("DataReceiver", "服务端发送数据给算力平台");
+                Communication::getSingleton()->sendYGIData(ygiData);
+                lastSendTime = now;
+            }
 
-//            // 发送JSON数据
-//            Communication::getSingleton()->send(
-//                    reinterpret_cast<const unsigned char*>(jsonStr.c_str()),
-//                    static_cast<int>(jsonStr.size())
-//            );
-            sendCustomJson(jsonStr.c_str());
+            // 保存帧
+//            EncodeFrame2Jpeg* yuv2jpg = new EncodeFrame2Jpeg();
+//            // 编码为jpeg
+//            yuv2jpg->encodeFrame2Jpeg(ygiData, 80);
+
+            // 计算道路坡度
+
+            // 计算道路曲率
+
         }
-
-
-        Log::info("DataReceiver", "服务端保存视频帧到sdcard");
-        saveFrameDataToFile(ygiData, frameIndex);
-
-        Log::info("DataReceiver", "服务端发送数据给算力平台");
-        Communication::getSingleton()->sendYGIData(ygiData);
-
-//        Log::info("DataReceiver", "服务端上传Zip帧压缩包到SaaS平台");
-
-    } else {
-        Log::info("DataReceiver", "GPS信坐标获取失败");
     }
 
     // 模拟数据接口调用
@@ -361,6 +376,16 @@ void handlerReaderFrame() {
 }
 
 /**
+ * 帧格式转换和保存
+ * @param ygiData
+ */
+//void FrameConverseAndSave(std::shared_ptr<YGIData> ygiData){
+//    auto yuv2jpg = std::make_unique<EncodeFrame2Jpeg>();
+//    yuv2jpg->encodeFrame2Jpeg(ygiData, 80); // 保存的图片质量，100为原始大小
+//    saveFrameDataToFile(ygiData);
+//}
+
+/**
  * 示例，启动数据接口
  */
 void DataReceiver::start() {
@@ -370,7 +395,8 @@ void DataReceiver::start() {
         Log::info("Application", "TX2连接成功");
     });
 
-
     std::thread thread(handlerReaderFrame);
+//    std::thread thread_yuv2jpg(FrameConverseAndSave);
     thread.detach();
+//    thread_yuv2jpg.detach();
 }

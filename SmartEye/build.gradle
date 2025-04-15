@@ -21,6 +21,11 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     signingConfigs {
 
         systemSign {
@@ -63,7 +68,6 @@ android {
     } // SocolJenkins
 
 
-
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
@@ -73,7 +77,7 @@ android {
 }
 
 // 直接运行可生成带系统签名的apk
-task signRelease (){
+task signRelease() {
     dependsOn 'assembleRelease'
     doLast {
         android.applicationVariants.all { variant ->
@@ -82,7 +86,7 @@ task signRelease (){
 
                     String newName = getApkName()
                     // 直接运行安装apk  build/outputs/apk
-                    def apkFilePath = getBuildDir().absolutePath + "/outputs/apk/release/"+newName+"-release.apk"
+                    def apkFilePath = getBuildDir().absolutePath + "/outputs/apk/release/" + newName + "-release.apk"
                     def apkDir = getBuildDir().absolutePath + "/outputs/apk/release"
                     println 'apkFilePath = ' + apkFilePath
                     def signDir = getProjectDir().absolutePath
@@ -92,7 +96,7 @@ task signRelease (){
                         // 切换到sh文件所在的目录，执行脚本
                         workingDir signDir
                         // 执行shell脚本 "," 传参
-                        commandLine "sh", signDir + "/sign/sign.sh", signDir, apkFilePath, apkDir + "/"+ newName+"-release-signed.apk"
+                        commandLine "sh", signDir + "/sign/sign.sh", signDir, apkFilePath, apkDir + "/" + newName + "-release-signed.apk"
                     }
 
                 }
@@ -111,4 +115,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.squareup.okio:okio:1.5.0'
+    implementation 'net.lingala.zip4j:zip4j:2.9.0'
+    implementation 'io.tus.java.client:tus-java-client:0.4.2'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'commons-io:commons-io:2.8.0'
 }
