@@ -1,4 +1,0 @@
-#Fri Mar 28 00:01:12 CST 2025
-base.0=/Users/lpf/Projects/AndroidStudioProjects/smarteye/Java/Android/SmartEye/build/intermediates/dex/debugAndroidTest/mergeDexDebugAndroidTest/out/classes.dex
-renamed.0=classes.dex
-path.0=classes.dex
