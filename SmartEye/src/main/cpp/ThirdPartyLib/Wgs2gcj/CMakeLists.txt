@@ -22,10 +22,10 @@ if (NOT _INCLUDE_WGS2GCJ_ AND PLATFORM_ANDROID)
             )
 
     # 编译成静态库
-#    add_library(Wgs2gcj_static STATIC ${LIBWGS2GCJ_SRCS})
-#    target_link_libraries(Wgs2gcj_static
-#            ${WGS2GCJ_LIBRARIES}
-#            )
+    add_library(Wgs2gcj_static STATIC ${LIBWGS2GCJ_SRCS})
+    target_link_libraries(Wgs2gcj_static
+            ${WGS2GCJ_LIBRARIES}
+            )
 
     # 编译为可执行文件
 #    add_executable(RunWgs2gcj main.cpp)

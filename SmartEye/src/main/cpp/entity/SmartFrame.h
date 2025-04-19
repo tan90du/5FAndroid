@@ -34,6 +34,10 @@ public:
             delete[] frameScaleData;
             frameScaleData = nullptr;
         }
+//        if (frameData != nullptr) {
+//            delete[] frameData;
+//            frameData = nullptr;
+//        }
     }
 public:
     int getWidth() const {

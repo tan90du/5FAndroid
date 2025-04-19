@@ -24,59 +24,18 @@
 #include <utility>
 #include "EncodeFrame2Jpeg.h"
 #include "functional"
+#include "../ThirdPartyLib/Wgs2gcj/Export_Inc/wgs2gcj.h"
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+
+// 添加线程安全的队列
+std::queue<std::shared_ptr<YGIData>> ygiDataQueue;
+std::mutex queueMutex;
+std::condition_variable queueCV;
 
 using namespace std;
 
-const double PI = 3.14159265358979324;
-
-static double transform_lat(double x, double y);
-
-static double transform_lon(double x, double y);
-
-pair<double, double> wgs84_to_gcj02(double lon, double lat) {
-    double a = 6378245.0;
-    double ee = 0.00669342162296594323;
-
-    double dlat = transform_lat(lon - 105.0, lat - 35.0);
-    double dlon = transform_lon(lon - 105.0, lat - 35.0);
-
-    double rad_lat = lat * PI / 180.0;
-    double magic = sin(rad_lat);
-    magic = 1 - ee * magic * magic;
-    double sqrt_magic = sqrt(magic);
-
-    dlat = (dlat * 180.0) / ((a * (1 - ee)) / (magic * sqrt_magic) * PI);
-    dlon = (dlon * 180.0) / (a / sqrt_magic * cos(rad_lat) * PI);
-
-    return make_pair(lon + dlon, lat + dlat);
-}
-
-pair<double, double> gcj02_to_bd09(double lon, double lat) {
-    double x_pi = 3000.0 / 180.0 * PI;
-    double z = sqrt(lon * lon + lat * lat) + 0.00002 * sin(lat * x_pi);
-    double theta = atan2(lat, lon) + 0.000003 * cos(lon * x_pi);
-
-    double bd_lon = z * cos(theta) + 0.0065;
-    double bd_lat = z * sin(theta) + 0.006;
-
-    return make_pair(bd_lon, bd_lat);
-}
-
-double transform_lat(double x, double y) {
-    double ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y
-                 + 0.1 * x * y + 0.2 * sqrt(fabs(x));
-    ret += (20.0 * sin(6.0 * x * PI) + 20.0 * sin(2.0 * x * PI)) * 2.0 / 3.0;
-    ret += (160.0 * sin(y * PI / 12.0) + 320 * sin(y * PI / 30.0)) * 2.0 / 3.0;
-    return ret;
-}
-
-double transform_lon(double x, double y) {
-    double ret = 300.0 + x + 2.0 * y + 0.1 * x * x
-                 + 0.1 * x * y + 0.1 * sqrt(fabs(x));
-    ret += (20.0 * sin(6.0 * x * PI) + 20.0 * sin(x * PI)) * 2.0 / 3.0;
-    ret += (150.0 * sin(x * PI / 12.0) + 300.0 * sin(x * PI / 30.0)) * 2.0 / 3.0;
-    return ret;
-}
 
 double calSlope(double s1, double s2, double h1, double h2, double time) {
     double avgSpeed = (s1 + s2) / 2;
@@ -152,7 +111,9 @@ void sendCustomJson(const std::string &jsonData) {
  * @param frameIndex
  */
 void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData) {
-    SmartFrame *smartFrame = ygiData->getSmartFrame();
+    Log::info("日志","帧");
+//    SmartFrame *smartFrame = ygiData->getSmartFrame();
+    auto smartFrame = ygiData->getSmartFrame();
     if (smartFrame && smartFrame->getFrameData() != nullptr && smartFrame->getDataSize() > 0) {
         // 假设任务开启时间为 20250401-0810，如果间隔10分钟更新时间，会创建新的文件夹 20250401-0820，用于视频帧的保存
         std::string time =
@@ -175,7 +136,9 @@ void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData) {
                                std::to_string(ygiData->getGpsVector()->at(0)->getLng()) + "-" +
                                std::to_string(ygiData->getGpsVector()->at(0)->getLat()) + "-" +
                                std::to_string(ygiData->getGpsVector()->at(0)->getAltitude()) + "-" +
-                               std::to_string(ygiData->getGpsVector()->at(0)->getSpeed()) + ".yuv";
+                               std::to_string(ygiData->getGpsVector()->at(0)->getSpeed()) + ".jpeg";
+
+//        Log::info("获取视频帧", filename.c_str());
         // 打开文件进行二进制写入
         std::ofstream outFile(filename, std::ios::out | std::ios::binary);
         if (outFile.is_open()) {
@@ -186,9 +149,12 @@ void saveFrameDataToFile(std::shared_ptr<YGIData> ygiData) {
         } else {
             Log::info("DataReceiver", "视频帧保存失败: %s", filename.c_str());
         }
+//        delete[] smartFrame->getFrameData();
     } else {
         Log::info("DataReceiver", "无效视频帧");
     }
+//    delete smartFrame;
+
 }
 
 // 运行在编码线程
@@ -216,30 +182,30 @@ void DataReceiver::encodeFinish(int code, std::shared_ptr<YGIData> ygiData) {
 
     Communication::getSingleton()->sendYGIData(ygiData);
 
-   /* ygiData->setStatus(EnumVIOStatus::Default);
-    auto *smartFrame = ygiData->getSmartFrame();
+    /* ygiData->setStatus(EnumVIOStatus::Default);
+     auto *smartFrame = ygiData->getSmartFrame();
 
-    // 检查下当前的容量是否大于maxMemory 如果依然超出缓存 则强制移除最早的一个(这种情况一般为vio异常或者长时间堵车导致)
-    while (currentMemorySize + smartFrame->getLength() > mDataCacheParams.maxMemory){
-        // 移除最早的一帧
-        std::map<u8, std::shared_ptr<YGIData>>::iterator iterator = mYgiDataMap->begin();
-        currentMemorySize -= iterator->second->getSmartFrame()->getLength();
-//        Log::info("YGIDataMemoryCache", "缓存已满,删除了第一帧 %llu", iterator->first);
-        mYgiDataMap->erase(iterator);
-    }
-    // 添加到map的末尾
-    mYgiDataMap->insert(std::make_pair(smartFrame->getTimestamp(), ygiData));
-    // 将当前的size加上
-    currentMemorySize += smartFrame->getLength();
-    u8 t2 = TimeUtils::currentTimeMicrosecond();
-    if (index % 100 == 0 || (t2 - t1) > 2000){
-        Log::info("YGIDataMemoryCache", "size = %d, 耗时 %lld, moreField = %s",
-                  mYgiDataMap->size(), t2 - t1, ygiData->getSmartFrame()->moreField.c_str());
-    }
-    index++;
-    if (index > 100000){
-        index = 0;
-    }*/
+     // 检查下当前的容量是否大于maxMemory 如果依然超出缓存 则强制移除最早的一个(这种情况一般为vio异常或者长时间堵车导致)
+     while (currentMemorySize + smartFrame->getLength() > mDataCacheParams.maxMemory){
+         // 移除最早的一帧
+         std::map<u8, std::shared_ptr<YGIData>>::iterator iterator = mYgiDataMap->begin();
+         currentMemorySize -= iterator->second->getSmartFrame()->getLength();
+ //        Log::info("YGIDataMemoryCache", "缓存已满,删除了第一帧 %llu", iterator->first);
+         mYgiDataMap->erase(iterator);
+     }
+     // 添加到map的末尾
+     mYgiDataMap->insert(std::make_pair(smartFrame->getTimestamp(), ygiData));
+     // 将当前的size加上
+     currentMemorySize += smartFrame->getLength();
+     u8 t2 = TimeUtils::currentTimeMicrosecond();
+     if (index % 100 == 0 || (t2 - t1) > 2000){
+         Log::info("YGIDataMemoryCache", "size = %d, 耗时 %lld, moreField = %s",
+                   mYgiDataMap->size(), t2 - t1, ygiData->getSmartFrame()->moreField.c_str());
+     }
+     index++;
+     if (index > 100000){
+         index = 0;
+     }*/
 }
 
 
@@ -264,31 +230,24 @@ void frameDataCallback(uint32_t frameIndex) {
     }
 
     if (!ygiData->getGpsVector()->empty()) {
-        //WGS84地图坐标转换成高德和百度地图坐标
-        auto gcj02 = wgs84_to_gcj02(ygiData->getGpsVector()->at(0)->getLng(),
-                                    ygiData->getGpsVector()->at(0)->getLat());
-//        Log::info("DataReceiver", "高德地图坐标x:%.8f,坐标y:%.8f", gcj02.first, gcj02.second);
-
-//        auto bd09 = gcj02_to_bd09(gcj02.first, gcj02.second);
-//        Log::info("DataReceiver", "百度地图坐标x:%.8f,坐标y:%.8f", bd09.first, bd09.second);
-
         /*Log::info("DataReceiver",
-                  "time = %lld, x = %.8f, y = %.8f, status = %d, Altitude = %.8f, speed = %.8f,",
-                  ygiData->getSmartFrame()->getTimestamp(),
-                  ygiData->getGpsVector()->at(0)->getLng(),
-                  ygiData->getGpsVector()->at(0)->getLat(),
-                  ygiData->getGpsVector()->at(0)->getGpsStatus(),
-                  ygiData->getGpsVector()->at(0)->getAltitude(),
-                  ygiData->getGpsVector()->at(0)->getSpeed());
-        Log::info("DataReceiver", "ygiData 获取到一帧");*/
+          "time = %lld, x = %.8f, y = %.8f, status = %d, Altitude = %.8f, speed = %.8f,",
+          ygiData->getSmartFrame()->getTimestamp(),
+          ygiData->getGpsVector()->at(0)->getLng(),
+          ygiData->getGpsVector()->at(0)->getLat(),
+          ygiData->getGpsVector()->at(0)->getGpsStatus(),
+          ygiData->getGpsVector()->at(0)->getAltitude(),
+          ygiData->getGpsVector()->at(0)->getSpeed());
+          Log::info("DataReceiver", "ygiData 获取到一帧");*/
+
+        //WGS84地图坐标转换成GCJ02坐标
+        double lng = 0.0, lat = 0.0;
+        wgs2gcj(ygiData->getGpsVector()->at(0)->getLng(),
+                ygiData->getGpsVector()->at(0)->getLat(),&lng, &lat);
+//        Log::info("GCJ02坐标", "经度: %.8f, 纬度: %.8f", lng, lat);
 
         // 构造包含经纬度的JSON字符串
         char jsonStr[256];
-//        double lng = ygiData->getGpsVector()->at(0)->getLng();
-//        double lat = ygiData->getGpsVector()->at(0)->getLat();
-        double lng = gcj02.first;
-        double lat = gcj02.second;
-
         snprintf(jsonStr, sizeof(jsonStr), R"(%.8f,%.8f)", lng, lat);
         std::string res = CxxCallJavaHelper::call("sendDeviceLocation", jsonStr);
 
@@ -301,17 +260,29 @@ void frameDataCallback(uint32_t frameIndex) {
             auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                     now - lastSendTime);
 
-            if (elapsed.count() >= 200) { // 定时发送
-                // 发送合法图片到算力终端
-                Log::info("DataReceiver", "服务端发送数据给算力平台");
+//            if (elapsed.count() >= 1000) { // 定时发送
+//                 // 发送合法图片到算力终端
+//                Log::info("DataReceiver", "服务端发送数据给算力平台");
                 Communication::getSingleton()->sendYGIData(ygiData);
-                lastSendTime = now;
-            }
+//
+//                // 当ygiData准备好后加入队列
+//                {
+//                    std::lock_guard<std::mutex> lock(queueMutex);
+//                    ygiDataQueue.push(ygiData);
+//                    size_t currentSize = ygiDataQueue.size();
+//                    Log::info("当前队列大小", "duilie %d", currentSize);
+//                    queueCV.notify_one();  // 通知处理线程
+//                }
+//                lastSendTime = now;
+//
+//            }
+
 
             // 保存帧
 //            EncodeFrame2Jpeg* yuv2jpg = new EncodeFrame2Jpeg();
-//            // 编码为jpeg
+////            // 编码为jpeg
 //            yuv2jpg->encodeFrame2Jpeg(ygiData, 80);
+//            saveFrameDataToFile(ygiData);
 
             // 计算道路坡度
 
@@ -375,15 +346,36 @@ void handlerReaderFrame() {
     autonavi::HDCOLLECT::HDClient_startHDCamera(frameDataCallback);
 }
 
-/**
- * 帧格式转换和保存
- * @param ygiData
- */
+///**
+// * 帧格式转换和保存
+// * @param ygiData
+// */
 //void FrameConverseAndSave(std::shared_ptr<YGIData> ygiData){
 //    auto yuv2jpg = std::make_unique<EncodeFrame2Jpeg>();
 //    yuv2jpg->encodeFrame2Jpeg(ygiData, 80); // 保存的图片质量，100为原始大小
 //    saveFrameDataToFile(ygiData);
 //}
+
+// 修改帧处理函数为持续运行的消费者
+void FrameConverseAndSave() {
+    static EncodeFrame2Jpeg encoder;
+    std::shared_ptr<YGIData> ygiData;
+    while (true) {
+        // 等待队列中有数据
+        {
+            std::unique_lock<std::mutex> lock(queueMutex);
+            queueCV.wait(lock, []{ return !ygiDataQueue.empty(); });
+
+            ygiData = ygiDataQueue.front();
+            ygiDataQueue.pop();
+        }
+//        std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // 休眠1000毫秒
+        // 执行实际的帧处理
+        encoder.encodeFrame2Jpeg(ygiData, 80);
+
+        saveFrameDataToFile(ygiData);
+    }
+}
 
 /**
  * 示例，启动数据接口

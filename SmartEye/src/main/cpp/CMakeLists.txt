@@ -19,6 +19,7 @@ include_directories(${HEADER_DIRECTORY}
         ./ThirdPartyLib/HPSocket/src/common/kcp
         ./ThirdPartyLib/Common/Export_Inc
         ./BaseLayer/JpegWrapper/Export_Inc
+        ./ThirdPartyLib/Wgs2gcj/Export_Inc
 
 )
 

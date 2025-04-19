@@ -13,7 +13,7 @@
 #include <vector>
 #include "EnumVIOStatus.h"
 #include "EnumYGISaveType.h"
-
+#include "Log.h"
 class YGIData {
 public:
     YGIData(){
@@ -27,6 +27,7 @@ public:
             delete[] mSmartFrame->getFrameData();
             delete mSmartFrame;
             mSmartFrame = nullptr;
+//            Log::info("neicunshifang", "释放frame数据了");
         }
         // 以下可以考虑模板函数实现
         if (mGPSVector != nullptr){

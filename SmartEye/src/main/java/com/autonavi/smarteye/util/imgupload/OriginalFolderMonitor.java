@@ -7,14 +7,21 @@ import android.util.Log;
 import net.lingala.zip4j.ZipFile;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 
 /**
@@ -40,6 +47,9 @@ public class OriginalFolderMonitor {
 
     // 开启监控
     public void startMonitoring() {
+        // 删除关机前最后一个可能未打包的文件夹。因为该文件夹可能带来打包出错
+        deleteLargestNameFolder(monitorFolderPath);
+
         // 定时扫描不活跃的文件夹是否可以打包
         scheduler.scheduleWithFixedDelay(this::checkInactiveFolders, 5, 5, TimeUnit.SECONDS);
 
@@ -175,5 +185,30 @@ public class OriginalFolderMonitor {
         }
         fileOrDirectory.delete();
     }
+
+    /**
+     * 删除名字最大的文件夹
+     *
+     * @param parentDirPath
+     */
+    private static void deleteLargestNameFolder(String parentDirPath) {
+        Path parent = Paths.get(parentDirPath);
+
+        // 1. 列出所有子目录并找出名字最大的
+        try (Stream<Path> stream = Files.list(parent)) {
+            Optional<Path> maxDir = stream
+                    .filter(Files::isDirectory)
+                    .max(Comparator.comparing(path -> path.getFileName().toString()));
+
+            if (maxDir.isPresent()) {
+                File file = maxDir.get().toFile();
+                deleteRecursively(file);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
 

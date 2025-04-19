@@ -1,9 +1,7 @@
 package com.autonavi.smarteye.service.http;
 
-import org.json.JSONException;
-
 public interface HttpCallback {
-    void onSuccess(String result) throws JSONException;
+    void onSuccess(String result);
 
     void onFailure(Exception e);
 }

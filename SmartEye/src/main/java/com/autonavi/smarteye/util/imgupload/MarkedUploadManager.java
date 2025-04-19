@@ -160,7 +160,7 @@ public class MarkedUploadManager {
         // 使用 MultipartBuilder 构建 multipart/form-data 请求体
         MultipartBuilder builder = new MultipartBuilder()
                 .type(MultipartBuilder.FORM)
-                .addFormDataPart("highlightImage", highlightImage.getName(),
+                .addFormDataPart("highlightImageUrl", highlightImage.getName(),
                         RequestBody.create(MEDIA_TYPE_IMAGE, highlightImage));
 
         // 解析 reqVO JSON 字符串，并将其中每个字段添加到表单参数中

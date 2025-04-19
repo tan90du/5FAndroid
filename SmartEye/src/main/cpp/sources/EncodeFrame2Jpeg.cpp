@@ -43,30 +43,35 @@ int EncodeFrame2Jpeg::encodeFrame2Jpeg(std::shared_ptr<YGIData> ygiData, int jpe
 //        }
 //        fclose(fp_in);
 
-
         getJpgUtil()->doSoftEncodeYuvToJpeg(frame->getFrameData(), frame->getLength(), 0, frame->getWidth(), frame->getHeight(), 4, jpegQuality, &jpgBuffer, jpgSize);
         if (jpgBuffer != nullptr) {
+            Log::info("测试", "帧转换");
+            delete[] frame->getFrameData();
             frame->setFrameData(jpgBuffer);
             frame->setType(EnumImage::JPEG);
             frame->setLength(jpgSize);
+//            delete frame;
+//            delete[] jpgBuffer;
+//            jpgBuffer = nullptr;
         }
-        if (frame->frameScaleData == nullptr) {
-//            u8 t2 = TimeUtils::currentTimeMicrosecond();
-//            // 大于30毫秒就输出日志
-//            if (t2 - t1 > 30000) {
-//                Log::info("EncodeFrame2Jpeg", "frame->getTimestamp() = %lld, encode 耗时 = %d", frame->getTimestamp(), t2 - t1);
-//            }
-//            onEncodedCallback(0, ygiData);
-            return 0;
-        }
-        BYTE *jpgScaleBuffer = nullptr;
-        int jpgScaleSize = 0;
-        getJpgUtil()->doSoftEncodeYuvToJpeg(frame->frameScaleData, frame->scaleLength, 0, 640, 360,
-                                            4, jpegQuality, &jpgScaleBuffer, jpgScaleSize);
-        if (jpgScaleBuffer != nullptr) {
-            frame->frameScaleData = jpgScaleBuffer;
-            frame->scaleLength = jpgScaleSize;
-        }
+//        if (frame->frameScaleData == nullptr) {
+////            u8 t2 = TimeUtils::currentTimeMicrosecond();
+////            // 大于30毫秒就输出日志
+////            if (t2 - t1 > 30000) {
+////                Log::info("EncodeFrame2Jpeg", "frame->getTimestamp() = %lld, encode 耗时 = %d", frame->getTimestamp(), t2 - t1);
+////            }
+////            onEncodedCallback(0, ygiData);
+//            return 0;
+//        }
+//        BYTE *jpgScaleBuffer = nullptr;
+//        int jpgScaleSize = 0;
+//        getJpgUtil()->doSoftEncodeYuvToJpeg(frame->frameScaleData, frame->scaleLength, 0, 640, 360,
+//                                            4, jpegQuality, &jpgScaleBuffer, jpgScaleSize);
+//        if (jpgScaleBuffer != nullptr) {
+//            delete[] frame->getFrameData();
+//            frame->frameScaleData = jpgScaleBuffer;
+//            frame->scaleLength = jpgScaleSize;
+//        }
 //        u8 t2 = TimeUtils::currentTimeMicrosecond();
 //        // 大于30毫秒就输出日志
 //        if (t2 - t1 > 30000) {
